@@ -35,6 +35,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
   src/bsp
   src/hw
   src/common
+  src/common/core
   src/common/hw/include
   )
 
