@@ -26,6 +26,7 @@ uint8_t  uartGetch(uint8_t ch);
 int32_t  uartWrite(uint8_t ch, uint8_t *p_data, uint32_t length);
 uint8_t  uartRead(uint8_t ch);
 int32_t  uartPrintf(uint8_t ch, const char *fmt, ...);
+int32_t  uartPrintf_P(uint8_t ch, const char *fmt, ...);
 uint32_t uartGetBaud(uint8_t ch);
 
 #endif

@@ -11,7 +11,6 @@ extern "C" {
 #include "led.h"
 #include "uart.h"
 
-
 bool hwInit(void);
 
 

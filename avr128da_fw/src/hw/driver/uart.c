@@ -91,6 +91,7 @@ bool uartOpen(uint8_t ch, uint32_t baud)
     p_uart->p_handle->CTRLA = (0x01 << USART_RXCIE_bp);           // Receive Complete Interrupt Enable
 
     p_uart->is_open  = true;
+    ret = true;
     break;
   }
 
@@ -224,6 +225,28 @@ int32_t uartPrintf(uint8_t ch, const char *fmt, ...)
   ret = uartWrite(ch, (uint8_t *)print_buffer, len);
 
   return ret;
+}
+
+int32_t uartPrintf_P(uint8_t ch, const char *fmt, ...)
+{
+  int32_t ret = 0;
+  va_list arg;
+  va_start (arg, fmt);
+  int32_t len;
+  char print_buffer[128];
+
+
+  len = vsnprintf_P(print_buffer, 128, fmt, arg);
+  va_end (arg);
+
+  ret = uartWrite(ch, (uint8_t *)print_buffer, len);
+
+  return ret;
+}
+
+uint32_t uartGetBaud(uint8_t ch)
+{
+  return uart_tbl[ch].baud;
 }
 
 void uartRxHandler(uint8_t ch, uint8_t rx_data)
