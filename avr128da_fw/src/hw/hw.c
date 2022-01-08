@@ -8,6 +8,7 @@ bool hwInit(void)
 {
   bspInit();
 
+  cliInit();
   ledInit();
   uartInit();
 
