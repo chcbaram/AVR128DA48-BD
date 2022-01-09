@@ -1,7 +1,6 @@
 #include "bsp.h"
 
 
-
 static volatile uint32_t ms_cnt = 0;
 
 ISR(TCB0_INT_vect, ISR_NOBLOCK)

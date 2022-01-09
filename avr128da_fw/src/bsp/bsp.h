@@ -14,6 +14,7 @@ extern "C" {
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 #include <avr/power.h>
+#include <avr/fuse.h>
 #include <util/delay.h>
 
 
