@@ -9,6 +9,16 @@
       "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -e -U flash:w:build/avr128da_fw.hex:i"
     },
     {
+      "label": "avrdude BOOTSIZE 0",
+      "type": "shell",
+      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:0:m"
+    },
+    {
+      "label": "avrdude BOOTSIZE 16KB",
+      "type": "shell",
+      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:32:m"
+    },
+    {
       "label": "build",
       "type": "shell",
       "command": "cmake --build build -j16"

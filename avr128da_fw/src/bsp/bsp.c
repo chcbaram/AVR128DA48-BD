@@ -16,6 +16,12 @@ ISR(TCB0_INT_vect, ISR_NOBLOCK)
 
 bool bspInit(void)
 {
+  if (FUSE.BOOTSIZE > 0)
+  {
+    // Interrupt Vector for BOOTCODE
+    _PROTECTED_WRITE(CPUINT.CTRLA, (CPUINT.CTRLA | CPUINT_IVSEL_bm));
+  }
+
   // Clocks
   //  
   CCP = CCP_IOREG_gc;
