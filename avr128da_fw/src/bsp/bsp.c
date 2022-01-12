@@ -10,7 +10,7 @@ ISR(TCB0_INT_vect, ISR_NOBLOCK)
 }
 
 
-
+extern int32_t  uartWrite(uint8_t ch, uint8_t *p_data, uint32_t length);
 
 
 
@@ -71,4 +71,32 @@ uint32_t millis(void)
   SREG = old_sreg;
 
   return ret;
+}
+
+void logPrintf(const char *fmt, ...)
+{
+  va_list arg;
+  va_start (arg, fmt);
+  int32_t len;
+  char print_buffer[128];
+
+
+  len = vsnprintf(print_buffer, 128, fmt, arg);
+  va_end (arg);
+
+  uartWrite(_DEF_UART1, (uint8_t *)print_buffer, len);
+}
+
+void logPrintf_P(const char *fmt, ...)
+{
+  va_list arg;
+  va_start (arg, fmt);
+  int32_t len;
+  char print_buffer[128];
+
+
+  len = vsnprintf_P(print_buffer, 128, fmt, arg);
+  va_end (arg);
+
+  uartWrite(_DEF_UART1, (uint8_t *)print_buffer, len);
 }

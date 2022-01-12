@@ -26,7 +26,7 @@ uint32_t millis(void);
 
 
 void logPrintf(const char *fmt, ...);
-
+void logPrintf_P(const char *fmt, ...);
 
 #ifdef __cplusplus
 }

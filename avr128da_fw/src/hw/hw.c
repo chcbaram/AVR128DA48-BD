@@ -4,12 +4,13 @@
 bool hwInit(void)
 {
   bspInit();
-
-  cliInit();
+  
+  cliInit();  
   ledInit();
   infoInit();
   uartInit();
   buttonInit();
+  resetInit();
 
   return true;
 }

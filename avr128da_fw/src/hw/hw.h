@@ -13,6 +13,7 @@ extern "C" {
 #include "cli.h"
 #include "info.h"
 #include "button.h"
+#include "reset.h"
 
 
 bool hwInit(void);

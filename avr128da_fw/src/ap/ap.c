@@ -1,12 +1,19 @@
 #include "ap.h"
 
+
 void cliTest(cli_args_t *args);
+
+
+
+
+
 
 void apInit(void)
 {  
   cliOpen(_DEF_UART1, 115200);   
-
   cliAdd("test", cliTest);
+
+  logPrintf_P(PSTR("\nBoot Loader..\n"));
 }
 
 void apMain(void)

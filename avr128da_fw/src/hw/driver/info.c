@@ -10,11 +10,13 @@ void cliInfo(cli_args_t *args);
   
 bool infoInit(void)
 {
+  #ifdef _USE_HW_CLI
   cliAdd("info", cliInfo);
-
+  #endif
   return true;
 }
 
+#ifdef _USE_HW_CLI
 void cliInfo(cli_args_t *args)
 {
   bool ret = false;
@@ -107,5 +109,6 @@ void cliInfo(cli_args_t *args)
     cliPrintf_P(PSTR("info fuse\n"));
   }
 }
+#endif
 
 #endif
