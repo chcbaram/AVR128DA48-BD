@@ -37,6 +37,8 @@ bool resetInit(void)
     reset_bits |= RESET_FROM_ETC;
 
 
+  RSTCTRL.RSTFR = RSTCTRL.RSTFR;
+
   #ifdef _USE_HW_CLI
   cliAdd("reset", cliReset);
   #endif
