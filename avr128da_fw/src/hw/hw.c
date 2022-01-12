@@ -9,6 +9,7 @@ bool hwInit(void)
   ledInit();
   infoInit();
   uartInit();
+  buttonInit();
 
   return true;
 }

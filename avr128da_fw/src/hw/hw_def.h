@@ -6,7 +6,7 @@
 #include "bsp.h"
 
 
-#define _DEF_FIRMWATRE_VERSION    "V220108R1"
+#define _DEF_FIRMWATRE_VERSION    "V220112R1"
 #define _DEF_BOARD_NAME           "AVR128DA48"
 
 
@@ -25,5 +25,9 @@
 #define      HW_CLI_CMD_NAME_MAX    14
 #define      HW_CLI_LINE_HIS_MAX    4
 #define      HW_CLI_LINE_BUF_MAX    48
+
+#define _USE_HW_BUTTON
+#define      HW_BUTTON_MAX_CH       1
+#define      HW_BUTTON_OBJ_USE      1
 
 #endif
