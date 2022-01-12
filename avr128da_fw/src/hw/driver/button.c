@@ -80,13 +80,14 @@ uint16_t buttonGetData(void)
 }
 
 #if HW_BUTTON_OBJ_USE == 1
-void buttonObjCreate(button_obj_t *p_obj, uint8_t ch, uint32_t pressed_time, uint32_t repeat_time)
+void buttonObjCreate(button_obj_t *p_obj, uint8_t ch, uint32_t pressed_time, uint32_t repeat_start_time, uint32_t repeat_pressed_time)
 {
   p_obj->ch = ch;
   p_obj->state = 0;
   p_obj->pre_time = millis();
   p_obj->pressed_time = pressed_time;
-  p_obj->repeat_time = repeat_time;
+  p_obj->repeat_start_time = repeat_start_time;
+  p_obj->repeat_pressed_time = repeat_pressed_time;
   p_obj->event_flag = 0;
   p_obj->state_flag = 0;
   p_obj->click_count = 0;
@@ -96,6 +97,7 @@ enum ButtonObjState
 {
   BUTTON_OBJ_WAIT_FOR_PRESSED,
   BUTTON_OBJ_PRESSED,
+  BUTTON_OBJ_REPEATED_START,
   BUTTON_OBJ_REPEATED,
 };
 
@@ -121,7 +123,7 @@ bool buttonObjUpdate(button_obj_t *p_obj)
         if (millis()-p_obj->pre_time >= p_obj->pressed_time)
         {
           ret = true; 
-          p_obj->state = BUTTON_OBJ_REPEATED;
+          p_obj->state = BUTTON_OBJ_REPEATED_START;
           p_obj->pre_time = millis();
           p_obj->event_flag |= BUTTON_EVT_CLICKED;
           
@@ -144,10 +146,34 @@ bool buttonObjUpdate(button_obj_t *p_obj)
       }
       break;
 
+    case BUTTON_OBJ_REPEATED_START:
+      if (buttonGetPressed(p_obj->ch) == true)
+      {
+        if (millis()-p_obj->pre_time >= p_obj->repeat_start_time)
+        {
+          ret = true;
+          p_obj->pre_time = millis();
+
+          ret = true; 
+          p_obj->state = BUTTON_OBJ_REPEATED;
+
+          p_obj->event_flag |= BUTTON_EVT_CLICKED;
+          p_obj->event_flag |= BUTTON_EVT_REPEATED;
+
+          p_obj->state_flag |= BUTTON_STATE_REPEATED;
+          p_obj->click_count++;
+        }
+      }
+      else
+      {
+        p_obj->state = BUTTON_OBJ_PRESSED;
+      }
+      break;
+
     case BUTTON_OBJ_REPEATED:
       if (buttonGetPressed(p_obj->ch) == true)
       {
-        if (millis()-p_obj->pre_time >= p_obj->repeat_time)
+        if (millis()-p_obj->pre_time >= p_obj->repeat_pressed_time)
         {
           ret = true;
           p_obj->pre_time = millis();
@@ -216,7 +242,7 @@ void cliButton(cli_args_t *args)
     uint8_t button_event;
 
     button_ch = constrain(args->getData(1), 0, BUTTON_MAX_CH-1);
-    buttonObjCreate(&button_sw, button_ch, 50, 200);
+    buttonObjCreate(&button_sw, button_ch, 50, 1000, 100);
 
     while(cliKeepLoop())
     {

@@ -19,7 +19,8 @@ typedef struct
   uint8_t  ch;
   uint8_t  state;
   uint32_t pressed_time;
-  uint32_t repeat_time;
+  uint32_t repeat_start_time;
+  uint32_t repeat_pressed_time;
   uint32_t pre_time;
 
   uint8_t event_flag;
@@ -46,7 +47,7 @@ bool buttonInit(void);
 bool buttonGetPressed(uint8_t ch);
 uint16_t buttonGetData(void);
 
-void buttonObjCreate(button_obj_t *p_obj, uint8_t ch, uint32_t pressed_time, uint32_t repeat_time);
+void buttonObjCreate(button_obj_t *p_obj, uint8_t ch, uint32_t pressed_time, uint32_t repeat_start_time, uint32_t repeat_pressed_time);
 bool buttonObjUpdate(button_obj_t *p_obj);
 uint8_t buttonObjGetEvent(button_obj_t *p_obj);
 void buttonObjClearEvent(button_obj_t *p_obj);
