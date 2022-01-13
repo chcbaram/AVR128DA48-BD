@@ -64,7 +64,7 @@ target_link_options(${EXECUTABLE} PRIVATE
   -lm
   -Wl,-Map=${PROJECT_NAME}.map,--cref
   -Wl,--gc-sections
-  -Wl,--section-start=.noinit=0x00804000
+  -Wl,--section-start=.data=0x00804010
   -Xlinker -print-memory-usage -Xlinker
   )
 
