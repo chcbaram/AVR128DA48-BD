@@ -14,7 +14,8 @@ file(GLOB SRC_FILES CONFIGURE_DEPENDS
 
 # 해당 폴더를 포함해서 하위 폴더까지의 파일도 찾는다.
 file(GLOB_RECURSE SRC_FILES_RECURSE CONFIGURE_DEPENDS
-  src/*.c
+  src/*.S
+  src/*.c  
   src/*.cpp
 )
 

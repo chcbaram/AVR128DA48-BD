@@ -14,6 +14,7 @@ extern "C" {
 #include "info.h"
 #include "button.h"
 #include "reset.h"
+#include "flash.h"
 
 
 bool hwInit(void);

@@ -13,6 +13,7 @@
 
 #define _USE_HW_INFO                
 #define _USE_HW_RESET
+#define _USE_HW_FLASH
 
 
 #define _USE_HW_LED

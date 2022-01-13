@@ -23,8 +23,9 @@ static bool is_tag_init = false;
 static reset_tag_t *p_tag = (reset_tag_t *)RESET_TAG_ADDR;
 
 
-
+#ifdef _USE_HW_CLI
 static void cliReset(cli_args_t *args);
+#endif
 
 
 bool resetInit(void)

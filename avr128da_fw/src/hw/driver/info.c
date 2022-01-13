@@ -4,9 +4,9 @@
 
 #ifdef _USE_HW_INFO
 
-
+#ifdef _USE_HW_CLI
 void cliInfo(cli_args_t *args);
-
+#endif
   
 bool infoInit(void)
 {

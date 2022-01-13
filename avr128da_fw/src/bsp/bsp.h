@@ -28,6 +28,14 @@ uint32_t millis(void);
 void logPrintf(const char *fmt, ...);
 void logPrintf_P(const char *fmt, ...);
 
+
+/* Jump in program memory at a specific address */
+extern void pgm_jmp_far(uint32_t addrr);
+
+/* Write a word in program memory at a specific address*/
+extern void pgm_word_write(uint32_t addrr, uint16_t data);
+
+
 #ifdef __cplusplus
 }
 #endif
