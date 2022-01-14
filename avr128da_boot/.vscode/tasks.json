@@ -1,0 +1,27 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "avrdude boot",
+      "type": "shell",
+      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -e -U flash:w:build/avr128da_boot.hex:i"
+    },
+    {
+      "label": "avrdude BOOTSIZE 0",
+      "type": "shell",
+      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:0:m"
+    },
+    {
+      "label": "avrdude BOOTSIZE 16KB",
+      "type": "shell",
+      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:32:m"
+    },
+    {
+      "label": "build boot",
+      "type": "shell",
+      "command": "cmake --build build -j16"
+    }
+  ]
+}

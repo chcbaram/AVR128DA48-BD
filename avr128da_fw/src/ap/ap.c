@@ -12,7 +12,7 @@ void apInit(void)
   cliOpen(_DEF_UART1, 115200);   
   #endif
 
-  logPrintf_P(PSTR("\nBoot Loader..\n"));
+  logPrintf_P(PSTR("\nFirmware..\n"));
 }
 
 void apMain(void)

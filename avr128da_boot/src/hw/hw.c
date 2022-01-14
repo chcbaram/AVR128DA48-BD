@@ -15,7 +15,6 @@ bool hwInit(void)
   resetInit();
   flashInit();
 
-  sei();
   return true;
 }
 
@@ -23,6 +22,7 @@ void jumpToApp(void)
 {
   cli();
 
+  resetSetMode(RESET_MODE_RUN_APP);
   pgm_jmp_far(FLASH_ADDR_FW/sizeof(uint16_t));  
 }
 

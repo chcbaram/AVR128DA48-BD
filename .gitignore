@@ -10,3 +10,4 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 avr128da_fw/build/
+avr128da_boot/build/

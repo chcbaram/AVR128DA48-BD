@@ -55,7 +55,10 @@ bool bspInit(void)
   TCB0.CTRLB   = (0x00 << TCB_CNTMODE_gp);              // Periodic Interrupt Mode
   TCB0.INTCTRL = (1 << TCB_CAPT_bp);                    // Capture Interrupt Enable
   TCB0.CCMP    = (1000*(F_CPU/1000000)) - 1;            // 1ms
-  TCB0.CTRLA  |= (1 << TCB_ENABLE_bp);                  // Timer Start  
+  TCB0.CTRLA  |= (1 << TCB_ENABLE_bp);                  // Timer Start
+
+
+  sei();
 
   return true;
 }
