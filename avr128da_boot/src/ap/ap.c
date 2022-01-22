@@ -2,6 +2,9 @@
 
 
 
+cmd_t cmd_boot;
+
+
 void apBoot(void);
 
 
@@ -18,6 +21,9 @@ void apInit(void)
   logPrintf_P(PSTR("\nBootloader..\n"));
 
   apBoot();
+
+  cmdInit(&cmd_boot);
+  cmdOpen(&cmd_boot, _DEF_UART1, 115200);
 }
 
 void apMain(void)
@@ -33,10 +39,20 @@ void apMain(void)
       pre_time = millis();
 
       ledToggle(_DEF_LED1);     
-
-      logPrintf_P(PSTR("millis : %d\n"), millis()); 
     }
     
+    if (cmdReceivePacket(&cmd_boot) == true)
+    {
+      if (cmd_boot.rx_packet.cmd == 0x00)
+      {
+        cmdSendResp(&cmd_boot, 0x00, CMD_OK, (uint8_t *)_DEF_FIRMWATRE_VERSION, strlen(_DEF_FIRMWATRE_VERSION));
+      }
+      if (cmd_boot.rx_packet.cmd == 0x01)
+      {
+        cmdSendResp(&cmd_boot, 0x00, CMD_OK, (uint8_t *)_DEF_BOARD_NAME, strlen(_DEF_BOARD_NAME));
+      }      
+    }
+
     #ifdef _USE_HW_CLI
     cliMain();
     #endif

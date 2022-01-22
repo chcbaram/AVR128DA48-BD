@@ -16,6 +16,7 @@
 #include "uart.h"
 #include "cli.h"
 #include "util.h"
+#include "cmd.h"
 
 
 void hwInit(void);

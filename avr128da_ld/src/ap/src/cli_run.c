@@ -3,11 +3,15 @@
 
 void cliRunInfo(cli_args_t *args);
 void cliRunUart(cli_args_t *args);
+void cliRunBoot(cli_args_t *args);
+
+
 
 void cliRunInit(void)
 {
   cliAdd("info", cliRunInfo);  
   cliAdd("uart", cliRunUart);  
+  cliAdd("boot", cliRunBoot);  
 }
 
 void cliRunInfo(cli_args_t *args)
@@ -123,5 +127,50 @@ void cliRunUart(cli_args_t *args)
     cliPrintf("uart list\n");
     cliPrintf("uart open comport baud\n");
     cliPrintf("uart test \n");
+  }
+}
+
+void cliRunBoot(cli_args_t *args)
+{
+  bool ret = false;
+
+
+  if (args->argc == 1)
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      uint8_t cmd;
+      cmd_t cmd_boot;
+
+      cmd = args->getData(0);
+
+      cmdInit(&cmd_boot);
+      cmdOpen(&cmd_boot, _USE_UART_CMD, uartGetBaud(_USE_UART_CMD));
+
+      cliPrintf("cmd  : 0x%02X\n", cmd);
+      if (cmdSendCmdRxResp(&cmd_boot, cmd, NULL, 0, 100) == true)
+      {
+        cmd_packet_t *p_packet = &cmd_boot.rx_packet;
+
+        p_packet->data[p_packet->length] = 0;
+        cliPrintf("resp : %s\n", p_packet->data);
+      } 
+      else
+      {
+        cliPrintf("not resp\n");
+      } 
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
+
+
+  if (ret == false)
+  {
+    cliPrintf("boot cmd[0x00~0xFF] \n");
   }
 }
