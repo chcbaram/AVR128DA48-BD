@@ -11,3 +11,4 @@ CTestTestfile.cmake
 _deps
 avr128da_fw/build/
 avr128da_boot/build/
+avr128da_ld/build/

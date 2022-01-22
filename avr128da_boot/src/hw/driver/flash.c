@@ -96,7 +96,7 @@ bool flashErase(uint32_t addr, uint32_t length)
       pgm_word_write(flash_addr, 0x00);                         // Dummy write to start erase operation      
 
       if (is_log == true)
-        cliPrintf_P(PSTR("Erased Addr 0x%X \n"), flash_addr); 
+        logPrintf_P(PSTR("Erased Addr 0x%X \n"), flash_addr); 
     }
 
     if (NVMCTRL.STATUS & NVMCTRL_ERROR_gm)

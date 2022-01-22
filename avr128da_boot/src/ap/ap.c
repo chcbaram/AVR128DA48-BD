@@ -11,6 +11,8 @@ void apInit(void)
 {  
   #ifdef _USE_HW_CLI
   cliOpen(_DEF_UART1, 115200);   
+  #else
+  uartOpen(_DEF_UART1, 115200);   
   #endif
 
   logPrintf_P(PSTR("\nBootloader..\n"));
@@ -30,7 +32,9 @@ void apMain(void)
     {
       pre_time = millis();
 
-      ledToggle(_DEF_LED1);      
+      ledToggle(_DEF_LED1);     
+
+      logPrintf_P(PSTR("millis : %d\n"), millis()); 
     }
     
     #ifdef _USE_HW_CLI
