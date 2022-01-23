@@ -168,9 +168,161 @@ void cliRunBoot(cli_args_t *args)
     ret = true;
   }
 
+  if (args->argc == 3 && args->isStr(0, "flash_read"))
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      uint8_t cmd;
+      cmd_t cmd_boot;
+      uint32_t addr;
+      uint32_t length;
+      uint8_t tx_buf[8];
+
+      cmd = 0x06;
+      addr = args->getData(1);
+      length = args->getData(2);
+
+      cmdInit(&cmd_boot);
+      cmdOpen(&cmd_boot, _USE_UART_CMD, uartGetBaud(_USE_UART_CMD));
+
+      cliPrintf("flash read 0x%X, %d\n", addr, length);
+
+      tx_buf[0] = (addr >>  0) & 0xFF;
+      tx_buf[1] = (addr >>  8) & 0xFF;
+      tx_buf[2] = (addr >> 16) & 0xFF;
+      tx_buf[3] = (addr >> 24) & 0xFF;
+
+      tx_buf[4] = (length >>  0) & 0xFF;
+      tx_buf[5] = (length >>  8) & 0xFF;
+      tx_buf[6] = (length >> 16) & 0xFF;
+      tx_buf[7] = (length >> 24) & 0xFF;
+
+      if (cmdSendCmdRxResp(&cmd_boot, cmd, tx_buf, 8, 100) == true)
+      {
+        cmd_packet_t *p_packet = &cmd_boot.rx_packet;
+
+        for (int i=0; i<p_packet->length; i++)
+        {
+          cliPrintf("resp : 0x%X : 0x%X\n", addr + i, p_packet->data[i]);
+        }
+      } 
+      else
+      {
+        cliPrintf("not resp\n");
+      } 
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
+
+  if (args->argc == 3 && args->isStr(0, "flash_write"))
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      uint8_t cmd;
+      cmd_t cmd_boot;
+      uint32_t addr;
+      uint32_t length;
+      uint32_t data;
+      uint8_t tx_buf[8+4];
+
+      cmd = 0x05;
+      addr = args->getData(1);
+      data = args->getData(2);
+      length = 4;
+
+      cmdInit(&cmd_boot);
+      cmdOpen(&cmd_boot, _USE_UART_CMD, uartGetBaud(_USE_UART_CMD));
+
+      cliPrintf("flash write 0x%X, 0x%X\n", addr, data);
+
+      tx_buf[0] = (addr >>  0) & 0xFF;
+      tx_buf[1] = (addr >>  8) & 0xFF;
+      tx_buf[2] = (addr >> 16) & 0xFF;
+      tx_buf[3] = (addr >> 24) & 0xFF;
+
+      tx_buf[4] = (length >>  0) & 0xFF;
+      tx_buf[5] = (length >>  8) & 0xFF;
+      tx_buf[6] = (length >> 16) & 0xFF;
+      tx_buf[7] = (length >> 24) & 0xFF;
+
+      tx_buf[8]  = (data >>  0) & 0xFF;
+      tx_buf[9]  = (data >>  8) & 0xFF;
+      tx_buf[10] = (data >> 16) & 0xFF;
+      tx_buf[11] = (data >> 24) & 0xFF;
+
+      if (cmdSendCmdRxResp(&cmd_boot, cmd, tx_buf, 12, 500) == true)
+      {
+        cliPrintf("error : %d \n", cmd_boot.rx_packet.error);
+      } 
+      else
+      {
+        cliPrintf("not resp\n");
+      } 
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
+
+  if (args->argc == 3 && args->isStr(0, "flash_erase"))
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      uint8_t cmd;
+      cmd_t cmd_boot;
+      uint32_t addr;
+      uint32_t length;
+      uint8_t tx_buf[8];
+
+      cmd = 0x04;
+      addr = args->getData(1);
+      length = args->getData(2);
+
+      cmdInit(&cmd_boot);
+      cmdOpen(&cmd_boot, _USE_UART_CMD, uartGetBaud(_USE_UART_CMD));
+
+      cliPrintf("flash erase 0x%X, %d\n", addr, length);
+
+      tx_buf[0] = (addr >>  0) & 0xFF;
+      tx_buf[1] = (addr >>  8) & 0xFF;
+      tx_buf[2] = (addr >> 16) & 0xFF;
+      tx_buf[3] = (addr >> 24) & 0xFF;
+
+      tx_buf[4] = (length >>  0) & 0xFF;
+      tx_buf[5] = (length >>  8) & 0xFF;
+      tx_buf[6] = (length >> 16) & 0xFF;
+      tx_buf[7] = (length >> 24) & 0xFF;
+
+      if (cmdSendCmdRxResp(&cmd_boot, cmd, tx_buf, 8, 500) == true)
+      {
+        cliPrintf("error : %d \n", cmd_boot.rx_packet.error);
+      } 
+      else
+      {
+        cliPrintf("not resp\n");
+      } 
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
 
   if (ret == false)
   {
     cliPrintf("boot cmd[0x00~0xFF] \n");
+    cliPrintf("boot flash_read addr[0x4000~] length[~256]\n");
+    cliPrintf("boot flash_write addr[0x4000~] data\n");
+    cliPrintf("boot flash_erase addr[0x4000~] length\n");
   }
 }

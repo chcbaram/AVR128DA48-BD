@@ -13,7 +13,7 @@ static bool is_log = false;
 
 
 static bool flashInPage(uint32_t page_num, uint32_t addr, uint32_t length);
-static bool flashInRange(uint32_t addr_begin, uint32_t length);
+
 
 
 #ifdef _USE_HW_CLI

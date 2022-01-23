@@ -1,5 +1,5 @@
 #include "ap.h"
-
+#include "boot/boot.h"
 
 
 cmd_t cmd_boot;
@@ -43,14 +43,7 @@ void apMain(void)
     
     if (cmdReceivePacket(&cmd_boot) == true)
     {
-      if (cmd_boot.rx_packet.cmd == 0x00)
-      {
-        cmdSendResp(&cmd_boot, 0x00, CMD_OK, (uint8_t *)_DEF_FIRMWATRE_VERSION, strlen(_DEF_FIRMWATRE_VERSION));
-      }
-      if (cmd_boot.rx_packet.cmd == 0x01)
-      {
-        cmdSendResp(&cmd_boot, 0x00, CMD_OK, (uint8_t *)_DEF_BOARD_NAME, strlen(_DEF_BOARD_NAME));
-      }      
+      bootProcessCmd(&cmd_boot);
     }
 
     #ifdef _USE_HW_CLI

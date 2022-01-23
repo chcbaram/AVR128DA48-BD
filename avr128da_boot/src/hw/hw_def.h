@@ -6,7 +6,7 @@
 #include "bsp.h"
 
 
-#define _DEF_FIRMWATRE_VERSION    "V220112R1"
+#define _DEF_FIRMWATRE_VERSION    "B220112R1"
 #define _DEF_BOARD_NAME           "AVR128DA48"
 
 
