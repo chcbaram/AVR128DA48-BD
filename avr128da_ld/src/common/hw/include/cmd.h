@@ -23,6 +23,7 @@
 
 
 #define CMD_OK                0
+#define CMD_TIMEOUT           255
 
 #define CMD_DIR_M_TO_S        0
 #define CMD_DIR_S_TO_M        1

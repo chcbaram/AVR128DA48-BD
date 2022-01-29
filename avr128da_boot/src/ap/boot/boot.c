@@ -20,7 +20,7 @@ static void bootCmdReadBootName(cmd_t *p_cmd);
 static void bootCmdFlashErase(cmd_t *p_cmd);
 static void bootCmdFlashWrite(cmd_t *p_cmd);
 static void bootCmdFlashRead(cmd_t *p_cmd);
-//static void bootCmdJumpToFw(cmd_t *p_cmd);
+static void bootCmdJumpToFw(cmd_t *p_cmd);
 
 
 
@@ -61,6 +61,7 @@ void bootProcessCmd(cmd_t *p_cmd)
       break;
 
     case BOOT_CMD_JUMP_TO_FW:
+      bootCmdJumpToFw(p_cmd);
       break;
 
     default:
@@ -189,4 +190,19 @@ void bootCmdFlashRead(cmd_t *p_cmd)
   cmdSendResp(p_cmd, resp_cmd, CMD_OK, tx_buf, length);
 }
 
-//void bootCmdJumpToFw(cmd_t *p_cmd);
+void bootCmdJumpToFw(cmd_t *p_cmd)
+{
+  uint8_t resp_cmd = p_cmd->rx_packet.cmd;
+
+  
+  if (pgm_read_word_far(FLASH_ADDR_FW) != 0xFFFF)
+  {
+    cmdSendResp(p_cmd, resp_cmd, CMD_OK, NULL, 0);
+    delay(10);
+    jumpToApp();
+  }
+  else
+  {
+    cmdSendResp(p_cmd, resp_cmd, ERR_BOOT_INVALID_FW, NULL, 0);
+  }  
+}

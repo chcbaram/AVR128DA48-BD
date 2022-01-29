@@ -246,12 +246,14 @@ bool cmdSendCmdRxResp(cmd_t *p_cmd, uint8_t cmd, uint8_t *p_data, uint32_t lengt
   {
     if (cmdReceivePacket(p_cmd) == true)
     {
+      p_cmd->error = p_cmd->rx_packet.error;
       ret = true;
       break;
     }
 
     if (millis()-time_pre >= timeout)
     {
+      p_cmd->error = CMD_TIMEOUT;
       break;
     }
   }
