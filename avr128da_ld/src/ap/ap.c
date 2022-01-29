@@ -84,6 +84,7 @@ void apMain(int argc, char *argv[])
 bool apGetOption(int argc, char *argv[])
 {
   int opt;
+  bool ret = true;
   
 
   arg_option.addr_fw = 0x4000;
@@ -96,6 +97,7 @@ bool apGetOption(int argc, char *argv[])
     {
       case 'h':
         apShowHelp();
+        ret = false;
         break;
 
       case 'c':
@@ -136,7 +138,7 @@ bool apGetOption(int argc, char *argv[])
     }
   }
 
-  return true;
+  return ret;
 }
 
 void apShowHelp(void)
