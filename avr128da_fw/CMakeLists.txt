@@ -80,6 +80,12 @@ add_custom_command(TARGET ${EXECUTABLE}
 
 add_custom_command(TARGET ${EXECUTABLE} 
   POST_BUILD
+  COMMAND ${CMAKE_OBJCOPY} ARGS -O binary -R .eeprom ${EXECUTABLE} ${PROJECT_NAME}.bin
+  COMMENT "Invoking: Make Bin"
+  )  
+
+add_custom_command(TARGET ${EXECUTABLE} 
+  POST_BUILD
   COMMAND ${CMAKE_OBJCOPY} ARGS -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 ${EXECUTABLE} ${PROJECT_NAME}.eep
   COMMENT "Invoking: Make EEPROM"
   )

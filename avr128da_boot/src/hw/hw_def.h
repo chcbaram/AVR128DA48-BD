@@ -33,7 +33,7 @@
 #define      HW_BUTTON_OBJ_USE      1
 
 #define _USE_HW_CMD
-#define      HW_CMD_MAX_DATA_LENGTH 256
+#define      HW_CMD_MAX_DATA_LENGTH (256+8)
 
 
 #define FLASH_ADDR_FW               0x4000

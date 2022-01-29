@@ -130,6 +130,26 @@ void cliRunUart(cli_args_t *args)
   }
 }
 
+int32_t getFileSize(char *file_name)
+{
+  int32_t ret = -1;
+  FILE *fp;
+
+  if ((fp = fopen( file_name, "rb")) == NULL)
+  {
+    fprintf( stderr, "Unable to open %s\n", file_name );
+    return -1;
+  }
+  else
+  {
+    fseek( fp, 0, SEEK_END );
+    ret = ftell( fp );
+    fclose(fp);
+  }
+
+  return ret;
+}
+
 void cliRunBoot(cli_args_t *args)
 {
   bool ret = false;
@@ -327,6 +347,106 @@ void cliRunBoot(cli_args_t *args)
       err_code = bootCmdJumpToFw();
       
       cliPrintf("error : %d \n", err_code);
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
+
+  if (args->argc == 3 && args->isStr(0, "down_fw"))
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      uint8_t err_code;
+      char *file_name;
+      uint32_t addr;
+      int32_t file_len;
+
+      file_name = args->getStr(1);
+      addr = args->getData(2);
+
+      bootInit(_USE_UART_CMD, NULL, uartGetBaud(_USE_UART_CMD));
+
+      cliPrintf("down_fw \n");
+
+      file_len = getFileSize(file_name);
+
+      cliPrintf("file_name : %s \n", file_name);
+      cliPrintf("file_addr : 0x%X \n", addr);
+      cliPrintf("file_len  : %d Bytes\n", file_len);
+
+
+      FILE *fp;
+
+      if ((fp = fopen(file_name, "rb")) == NULL)
+      {
+        cliPrintf("Unable to open %s\n", file_name);
+        apExit();
+      }
+
+      while(1)
+      {
+        if (file_len <= 0) break;
+      
+        // 1. Flash Erase
+        //
+        err_code = bootCmdFlashErase(addr, file_len, 5000);
+        if (err_code != CMD_OK)
+        {
+          cliPrintf("bootCmdFlashErase Fail : %d\n", err_code);
+          break;
+        }
+        cliPrintf("bootCmdFlashErase OK : 0x%X, %d Bytes\n", addr, file_len);
+
+
+        // 2. Flash Write
+        //
+        uint32_t tx_block_size = 256;
+        uint8_t  tx_buf[256];
+        uint32_t tx_len;
+        int32_t  len_to_send;
+        bool write_done = false;
+
+        tx_len = 0;
+        while(tx_len < file_len)
+        {
+          len_to_send = fread(tx_buf, 1, tx_block_size, fp);
+          if (len_to_send <= 0)
+          {
+            break;
+          }
+
+          err_code = bootCmdFlashWrite(addr + tx_len, tx_buf, len_to_send, 500);
+          if (err_code != CMD_OK)
+          {
+            cliPrintf("bootCmdFlashWrite Fail : %d, 0x%X\n", err_code, addr + tx_len);
+            break;
+          }
+          else
+          {
+            cliPrintf("bootCmdFlashWrite %d/%d\n", tx_len, file_len);
+          }
+
+          tx_len += len_to_send;    
+
+          if (tx_len == file_len)
+          {
+            write_done = true;
+            break;
+          }      
+        }
+
+        if (write_done == true)
+        {
+          cliPrintf("bootCmdFlashWrite OK\n");
+        }
+        break;
+      }
+
+      fclose(fp);
     }
     else
     {

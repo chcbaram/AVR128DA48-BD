@@ -4,4 +4,6 @@
 #include "hw.h"
 
 
+void apExit(void);
+
 #endif
