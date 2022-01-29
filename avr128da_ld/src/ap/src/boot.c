@@ -32,6 +32,19 @@ bool bootInit(uint8_t ch, char *port_name, uint32_t baud)
     uartSetPortName(ch, port_name);
   }
 
+  // Jump To Bootloader
+  //
+  if (uartIsOpen(ch) == true)
+  {
+    uartClose(ch);  
+  }
+
+  uartOpen(ch, baud);
+  uartPrintf(ch, "\r\nreset boot 0x01\r\n");  
+  delay(10);
+  uartClose(ch);
+  delay(100);  
+
   ret = cmdOpen(&cmd_boot, ch, baud);
 
   return ret;

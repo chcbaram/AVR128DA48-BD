@@ -12,6 +12,11 @@
       "label": "build fw",
       "type": "shell",
       "command": "cmake --build build -j16"
-    }
+    },
+    {
+      "label": "down fw",
+      "type": "shell",
+      "command": "./tools/avr128da_ld.exe -p com46 -b 115200 -f ./build/avr128da_fw.bin -r"
+    }    
   ]
 }

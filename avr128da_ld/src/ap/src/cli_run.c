@@ -1,10 +1,13 @@
 #include "cli_run.h"
 #include "boot.h"
 
+
 void cliRunInfo(cli_args_t *args);
 void cliRunUart(cli_args_t *args);
 void cliRunBoot(cli_args_t *args);
 
+
+static int32_t getFileSize(char *file_name);
 
 
 void cliRunInit(void)
@@ -427,7 +430,7 @@ void cliRunBoot(cli_args_t *args)
           }
           else
           {
-            cliPrintf("bootCmdFlashWrite %d/%d\n", tx_len, file_len);
+            cliPrintf("bootCmdFlashWrite %d%%\r", ((tx_len+len_to_send)*100/file_len));
           }
 
           tx_len += len_to_send;    
@@ -439,9 +442,14 @@ void cliRunBoot(cli_args_t *args)
           }      
         }
 
+        cliPrintf("\n");
+
         if (write_done == true)
         {
           cliPrintf("bootCmdFlashWrite OK\n");
+
+          err_code = bootCmdJumpToFw();
+          cliPrintf("bootCmdJumpToFw   OK\n");
         }
         break;
       }
