@@ -5,7 +5,6 @@
 
 
 
-
 void apInit(void)
 {  
   #ifdef _USE_HW_CLI

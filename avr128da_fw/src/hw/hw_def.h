@@ -34,5 +34,6 @@
 
 
 #define FLASH_ADDR_FW               0x4000
+#define FLASH_ADDR_FW_VER           0x40EC
 
 #endif
