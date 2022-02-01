@@ -15,8 +15,8 @@
 
 static void bootCmdReadBootVersion(cmd_t *p_cmd);
 static void bootCmdReadBootName(cmd_t *p_cmd);
-//static void bootCmdReadFirmVersion(cmd_t *p_cmd);
-//static void bootCmdReadFirmName(cmd_t *p_cmd);
+static void bootCmdReadFirmVersion(cmd_t *p_cmd);
+static void bootCmdReadFirmName(cmd_t *p_cmd);
 static void bootCmdFlashErase(cmd_t *p_cmd);
 static void bootCmdFlashWrite(cmd_t *p_cmd);
 static void bootCmdFlashRead(cmd_t *p_cmd);
@@ -43,9 +43,11 @@ void bootProcessCmd(cmd_t *p_cmd)
       break;
 
     case BOOT_CMD_READ_FIRM_VERSION:
+      bootCmdReadFirmVersion(p_cmd);
       break;
     
     case BOOT_CMD_READ_FIRM_NAME:
+      bootCmdReadFirmName(p_cmd);
       break;
 
     case BOOT_CMD_FLASH_ERASE:
@@ -83,8 +85,32 @@ void bootCmdReadBootName(cmd_t *p_cmd)
   cmdSendResp(p_cmd, resp_cmd, CMD_OK, (uint8_t *)_DEF_BOARD_NAME, strlen(_DEF_BOARD_NAME));
 }
 
-//void bootCmdReadFirmVersion(cmd_t *p_cmd)
-//void bootCmdReadFirmName(cmd_t *p_cmd);
+void bootCmdReadFirmVersion(cmd_t *p_cmd)
+{
+  uint8_t resp_cmd = p_cmd->rx_packet.cmd;
+  firm_ver_t ver;
+        
+  memcpy_PF(&ver, FLASH_ADDR_FW_VER, sizeof(firm_ver_t)); 
+  if (ver.magic_number != VERSION_MAGIC_NUMBER)
+  {
+    ver.version_str[0] = 0;
+  }
+  cmdSendResp(p_cmd, resp_cmd, CMD_OK, (uint8_t *)ver.version_str, strlen(ver.version_str));
+}
+
+void bootCmdReadFirmName(cmd_t *p_cmd)
+{
+  uint8_t resp_cmd = p_cmd->rx_packet.cmd;
+  firm_ver_t ver;
+        
+  memcpy_PF(&ver, FLASH_ADDR_FW_VER, sizeof(firm_ver_t)); 
+  if (ver.magic_number != VERSION_MAGIC_NUMBER)
+  {
+    ver.name_str[0] = 0;
+  }  
+  cmdSendResp(p_cmd, resp_cmd, CMD_OK, (uint8_t *)ver.name_str, strlen(ver.name_str));
+}
+
 void bootCmdFlashErase(cmd_t *p_cmd)
 {
   uint8_t resp_cmd = p_cmd->rx_packet.cmd;

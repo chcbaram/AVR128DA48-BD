@@ -35,6 +35,7 @@ typedef struct
   char     file_str[128];
   uint32_t addr_fw;
   bool     run_fw;
+  uint32_t addr_ver;  
 } arg_option_t;
 
 
@@ -47,7 +48,7 @@ bool apGetOption(int argc, char *argv[]);
 void apCliMode(void);
 void apDownMode(void);
 int32_t getFileSize(char *file_name);
-
+int32_t getFileVersion(char *file_name, firm_ver_t *p_ver);
 
 
 
@@ -87,11 +88,12 @@ bool apGetOption(int argc, char *argv[])
   bool ret = true;
   
 
+  arg_option.addr_ver = 0x00EC;
   arg_option.addr_fw = 0x4000;
   arg_option.run_fw = false;
   arg_option.arg_bits = 0;
 
-  while((opt = getopt(argc, argv, "hcp:b:f:a:r")) != -1)
+  while((opt = getopt(argc, argv, "hcp:b:f:a:rv:")) != -1)
   {
     switch(opt)
     {
@@ -127,6 +129,11 @@ bool apGetOption(int argc, char *argv[])
         logPrintf("-a 0x%X\n", arg_option.addr_fw);
         break;
 
+      case 'v':
+        arg_option.addr_ver = (uint32_t)strtoul((const char * )optarg, (char **)NULL, (int) 0);
+        logPrintf("-v 0x%X\n", arg_option.addr_ver);
+        break;
+
       case 'r':
         arg_option.run_fw = true;
         logPrintf("-r 1\n");
@@ -150,6 +157,7 @@ void apShowHelp(void)
   logPrintf("            -b 115200: baud\n");
   logPrintf("            -f fw.bin: firmware\n");
   logPrintf("            -a 0x4000: firmware addr\n");
+  logPrintf("            -v 0x00EC: version addr\n");
   logPrintf("            -r       : run firmware\n");
 }
 
@@ -183,6 +191,26 @@ int32_t getFileSize(char *file_name)
   return ret;
 }
 
+int32_t getFileVersion(char *file_name, firm_ver_t *p_ver)
+{
+  int32_t ret = -1;
+  FILE *fp;
+
+  if ((fp = fopen( file_name, "rb")) == NULL)
+  {
+    fprintf( stderr, "Unable to open %s\n", file_name );
+    return -1;
+  }
+  else
+  {
+    fseek( fp, arg_option.addr_ver, SEEK_SET );
+    ret = fread(p_ver, 1, sizeof(firm_ver_t), fp);
+    fclose(fp);
+  }
+
+  return ret;
+}
+
 void apDownMode(void)
 {
   uint32_t arg_check = ARG_OPTION_PORT | ARG_OPTION_BAUD | ARG_OPTION_FILE;
@@ -207,7 +235,7 @@ void apDownMode(void)
     return;
   }
 
-  logPrintf("Download Begin..");
+  logPrintf("Download Begin..\n");
 
 
   uint8_t err_code;
@@ -217,6 +245,9 @@ void apDownMode(void)
   uint32_t baud;
   char boot_version[32];
   char boot_name[32];
+  char firm_version[32];
+  char firm_name[32];
+  firm_ver_t firm_ver;
 
   file_name = arg_option.file_str;
   addr = arg_option.addr_fw;
@@ -232,6 +263,16 @@ void apDownMode(void)
   logPrintf("file_len  : %d Bytes\n", file_len);
 
 
+  getFileVersion(file_name, &firm_ver);
+  if (firm_ver.magic_number != VERSION_MAGIC_NUMBER)
+  {
+    firm_ver.version_str[0] = 0;
+    firm_ver.name_str[0] = 0;
+  }
+  logPrintf("file ver  : %s\n", firm_ver.version_str);    
+  logPrintf("file name : %s\n", firm_ver.name_str);  
+
+
   FILE *fp;
 
   if ((fp = fopen(file_name, "rb")) == NULL)
@@ -243,7 +284,9 @@ void apDownMode(void)
   while(1)
   {
     if (file_len <= 0) break;
-  
+
+
+    logPrintf("\n");
 
     // Read Boot Version
     //
@@ -259,6 +302,23 @@ void apDownMode(void)
       logPrintf("boot name : %s\n", boot_name);    
     }
 
+    logPrintf("\n");
+
+    // Read Firm Version
+    //
+    err_code = bootCmdReadFirmVersion(firm_version);
+    if (err_code == CMD_OK)
+    {
+      logPrintf("firm ver  : %s\n", firm_version);    
+    }
+
+    err_code = bootCmdReadFirmName(firm_name);
+    if (err_code == CMD_OK)
+    {
+      logPrintf("firm name : %s\n", firm_name);    
+    }
+
+    logPrintf("\n");
 
     // 1. Flash Erase
     //

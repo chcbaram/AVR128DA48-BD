@@ -113,8 +113,57 @@ uint8_t bootCmdReadBootName(char *p_str)
   return ret;
 }
 
-//void bootCmdReadFirmVersion(cmd_t *p_cmd);
-//void bootCmdReadFirmName(cmd_t *p_cmd);
+uint8_t bootCmdReadFirmVersion(char *p_str)
+{
+  uint8_t ret = CMD_OK;
+  cmd_t *p_cmd = &cmd_boot;
+
+
+
+  if (cmdSendCmdRxResp(p_cmd, BOOT_CMD_READ_FIRM_VERSION, NULL, 0, 100) == true)
+  {
+    cmd_packet_t *p_packet = &p_cmd->rx_packet;
+
+    if (cmd_boot.error == CMD_OK)
+    {
+      for (int i=0; i<p_packet->length; i++)
+      {
+        p_str[i] = p_packet->data[i];
+      }
+      p_str[p_packet->length] = 0;
+    }
+  } 
+
+  ret = p_cmd->error;
+
+  return ret;  
+}
+
+uint8_t bootCmdReadFirmName(char *p_str)
+{
+  uint8_t ret = CMD_OK;
+  cmd_t *p_cmd = &cmd_boot;
+
+
+
+  if (cmdSendCmdRxResp(p_cmd, BOOT_CMD_READ_FIRM_NAME, NULL, 0, 100) == true)
+  {
+    cmd_packet_t *p_packet = &p_cmd->rx_packet;
+
+    if (cmd_boot.error == CMD_OK)
+    {
+      for (int i=0; i<p_packet->length; i++)
+      {
+        p_str[i] = p_packet->data[i];
+      }
+      p_str[p_packet->length] = 0;
+    }
+  } 
+
+  ret = p_cmd->error;
+
+  return ret;   
+}
 
 uint8_t bootCmdFlashErase(uint32_t addr, uint32_t length, uint32_t timeout)
 {

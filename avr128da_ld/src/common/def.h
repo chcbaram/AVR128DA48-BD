@@ -47,4 +47,15 @@
 
 
 
+#define VERSION_MAGIC_NUMBER      0x56455220    // "VER "
+
+
+typedef struct 
+{
+  uint32_t magic_number;
+  char version_str[32];
+  char name_str[32];
+} firm_ver_t;
+
+
 #endif /* SRC_COMMON_DEF_H_ */

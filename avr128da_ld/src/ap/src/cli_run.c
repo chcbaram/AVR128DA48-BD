@@ -245,6 +245,60 @@ void cliRunBoot(cli_args_t *args)
     ret = true;
   }
 
+  if (args->argc == 1 && args->isStr(0, "firm_version"))
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      bootInit(_USE_UART_CMD, NULL, uartGetBaud(_USE_UART_CMD));
+      
+      char str[32];
+      uint8_t err_code;
+
+      err_code = bootCmdReadFirmVersion(str);      
+      if (err_code == CMD_OK)
+      {
+        cliPrintf("firm_version : %s\n", str);
+      }
+      else
+      {
+        cliPrintf("\t err : %d\n", err_code);
+      }
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
+
+  if (args->argc == 1 && args->isStr(0, "firm_name"))
+  {
+    if (uartIsOpen(_USE_UART_CMD))
+    {
+      bootInit(_USE_UART_CMD, NULL, uartGetBaud(_USE_UART_CMD));
+      
+      char str[32];
+      uint8_t err_code;
+
+      err_code = bootCmdReadFirmName(str);      
+      if (err_code == CMD_OK)
+      {
+        cliPrintf("firm_version : %s\n", str);
+      }
+      else
+      {
+        cliPrintf("\t err : %d\n", err_code);
+      }
+    }
+    else
+    {
+      cliPrintf("Uart  : Closed\n");
+      cliPrintf("Need to run uart open\n");      
+    }
+    ret = true;
+  }
+
   if (args->argc == 3 && args->isStr(0, "flash_read"))
   {
     if (uartIsOpen(_USE_UART_CMD))
@@ -469,6 +523,8 @@ void cliRunBoot(cli_args_t *args)
     cliPrintf("boot cmd cmd[0x00~0xFF] \n");
     cliPrintf("boot boot_version\n");
     cliPrintf("boot boot_name\n");
+    cliPrintf("boot firm_version\n");
+    cliPrintf("boot firm_name\n");
     cliPrintf("boot flash_read addr[0x4000~] length[~256]\n");
     cliPrintf("boot flash_write addr[0x4000~] data\n");
     cliPrintf("boot flash_erase addr[0x4000~] length\n");
