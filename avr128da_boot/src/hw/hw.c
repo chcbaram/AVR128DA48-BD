@@ -1,6 +1,16 @@
 #include "hw.h"
 
 
+
+volatile const firm_ver_t boot_ver __attribute__((section(".vectors"))) = 
+{
+  .magic_number = VERSION_MAGIC_NUMBER,
+  .version_str  = _DEF_FIRMWATRE_VERSION,
+  .name_str     = _DEF_BOARD_NAME,
+};
+
+
+
 bool hwInit(void)
 {
   bspInit();
