@@ -10,7 +10,7 @@ void bootInit(void);
 void bootProcessCmd(cmd_t *p_cmd);
 void bootJumpToFw(void);
 bool bootVerifyFw(void);
-bool bootVerifyCrc(void);
+
 
 
 

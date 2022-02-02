@@ -18,6 +18,7 @@
 #define ERR_BOOT_INVALID_FW           16
 #define ERR_BOOT_FW_CRC               17
 #define ERR_BOOT_JUMP_TO_FW           18
+#define ERR_BOOT_INVALID_TAG          19
 
 
 #endif

@@ -10,7 +10,9 @@
 #define BOOT_CMD_FLASH_WRITE            0x05
 #define BOOT_CMD_FLASH_READ             0x06
 #define BOOT_CMD_JUMP_TO_FW             0x08
-
+#define BOOT_CMD_TAG_READ               0x09
+#define BOOT_CMD_TAG_WRITE              0x0A
+#define BOOT_CMD_TAG_VERIFY             0x0B
 
 
 static void bootCmdReadBootVersion(cmd_t *p_cmd);
@@ -21,6 +23,9 @@ static void bootCmdFlashErase(cmd_t *p_cmd);
 static void bootCmdFlashWrite(cmd_t *p_cmd);
 static void bootCmdFlashRead(cmd_t *p_cmd);
 static void bootCmdJumpToFw(cmd_t *p_cmd);
+static void bootCmdTagRead(cmd_t *p_cmd);
+static void bootCmdTagWrite(cmd_t *p_cmd);
+static void bootCmdTagVerify(cmd_t *p_cmd);
 
 
 
@@ -66,7 +71,20 @@ void bootProcessCmd(cmd_t *p_cmd)
       bootCmdJumpToFw(p_cmd);
       break;
 
+    case BOOT_CMD_TAG_READ:
+      bootCmdTagRead(p_cmd);
+      break;
+
+    case BOOT_CMD_TAG_WRITE:
+      bootCmdTagWrite(p_cmd);
+      break;
+
+    case BOOT_CMD_TAG_VERIFY:
+      bootCmdTagVerify(p_cmd);
+      break;
+
     default:
+      cmdSendResp(p_cmd, p_cmd->rx_packet.cmd, ERR_BOOT_WRONG_CMD, NULL, 0);
       break;
   }
 }
@@ -231,4 +249,110 @@ void bootCmdJumpToFw(cmd_t *p_cmd)
   {
     cmdSendResp(p_cmd, resp_cmd, ERR_BOOT_INVALID_FW, NULL, 0);
   }  
+}
+
+void bootCmdTagRead(cmd_t *p_cmd)
+{
+  uint8_t resp_cmd = p_cmd->rx_packet.cmd;
+  firm_tag_t tag;
+        
+  memcpy_PF(&tag, FLASH_ADDR_FW_TAG, sizeof(firm_tag_t)); 
+  cmdSendResp(p_cmd, resp_cmd, CMD_OK, (uint8_t *)&tag, sizeof(firm_tag_t));
+}
+
+void bootCmdTagWrite(cmd_t *p_cmd)
+{  
+  uint8_t resp_cmd = p_cmd->rx_packet.cmd;
+  firm_tag_t tag;
+  uint8_t err_code = CMD_OK;
+  uint32_t addr;
+  uint32_t length;
+        
+  addr = FLASH_ADDR_FW_TAG;
+  length = sizeof(firm_tag_t);
+
+  memcpy(&tag, p_cmd->rx_packet.data, length); 
+  if (tag.magic_number == TAG_MAGIC_NUMBER)
+  {
+    if (flashErase(addr, length) == true)
+    {
+      if (flashWrite(addr, (uint8_t *)&tag, length) != true)
+      {
+        err_code = ERR_BOOT_FLASH_WRITE;
+      }
+    }
+    else
+    {
+      err_code = ERR_BOOT_FLASH_ERASE;
+    }    
+  }
+  else
+  {
+    err_code = ERR_BOOT_INVALID_TAG;
+  }
+
+  cmdSendResp(p_cmd, resp_cmd, err_code, NULL, 0);
+}
+
+void bootCmdTagVerify(cmd_t *p_cmd)
+{
+  uint8_t resp_cmd = p_cmd->rx_packet.cmd;
+  firm_tag_t tag;
+  uint8_t err_code = CMD_OK;
+
+
+  memcpy_PF(&tag, FLASH_ADDR_FW_TAG, sizeof(firm_tag_t)); 
+  if (tag.magic_number == TAG_MAGIC_NUMBER)
+  {
+    uint32_t i;
+    uint16_t crc;
+    uint8_t data;
+
+    crc = 0;
+    for (i=0; i<tag.fw_size; i++)
+    {
+      data = pgm_read_byte_far(tag.fw_addr + i);
+      utilUpdateCrc(&crc, data);
+    }
+
+    if (crc != tag.fw_crc)
+    {
+      err_code = ERR_BOOT_FW_CRC;
+    }
+  }
+  else
+  {
+    err_code = ERR_BOOT_INVALID_TAG;
+  }
+
+  cmdSendResp(p_cmd, resp_cmd, err_code, NULL, 0);
+}
+
+bool bootVerifyFw(void)
+{
+  bool ret = false;
+  firm_tag_t tag;
+
+
+  memcpy_PF(&tag, FLASH_ADDR_FW_TAG, sizeof(firm_tag_t)); 
+  if (tag.magic_number == TAG_MAGIC_NUMBER)
+  {
+    uint32_t i;
+    uint16_t crc;
+    uint8_t data;
+
+    crc = 0;
+    for (i=0; i<tag.fw_size; i++)
+    {
+      data = pgm_read_byte_far(tag.fw_addr + i);
+      utilUpdateCrc(&crc, data);
+    }
+
+    if (crc == tag.fw_crc)
+    {
+      ret = true;
+    }
+  }
+
+  return ret;
 }

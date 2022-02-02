@@ -77,8 +77,16 @@ void apBoot(void)
 
   if (is_run_boot != true)
   {
-    logPrintf_P(PSTR("\nJump To App..\n"));
-    delay(10);
-    jumpToApp();  
+    if (bootVerifyFw() == true)
+    {
+      logPrintf_P(PSTR("\nVerify OK.."));
+      logPrintf_P(PSTR("\nJump To App..\n"));
+      delay(10);
+      jumpToApp();  
+    }
+    else
+    {
+      logPrintf_P(PSTR("\nVerify Fail..\n"));
+    }
   }
 }

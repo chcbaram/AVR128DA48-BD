@@ -11,6 +11,9 @@
 #define BOOT_CMD_FLASH_WRITE            0x05
 #define BOOT_CMD_FLASH_READ             0x06
 #define BOOT_CMD_JUMP_TO_FW             0x08
+#define BOOT_CMD_TAG_READ               0x09
+#define BOOT_CMD_TAG_WRITE              0x0A
+#define BOOT_CMD_TAG_VERIFY             0x0B
 
 
 
@@ -269,4 +272,52 @@ uint8_t bootCmdJumpToFw(void)
   ret = p_cmd->error;
 
   return ret;  
+}
+
+uint8_t bootCmdTagRead(firm_tag_t *p_tag)
+{
+  uint8_t ret = CMD_OK;
+  cmd_t *p_cmd = &cmd_boot;
+
+
+  if (cmdSendCmdRxResp(p_cmd, BOOT_CMD_TAG_READ, NULL, 0, 100) == true)
+  {
+    cmd_packet_t *p_packet = &p_cmd->rx_packet;
+
+    if (p_cmd->error == CMD_OK)
+    {
+      uint8_t *p_data = (uint8_t *)p_tag;
+      for (int i=0; i<p_packet->length; i++)
+      {
+        p_data[i] = p_packet->data[i];
+      }  
+    }
+  }
+  ret = p_cmd->error;
+
+  return ret;  
+}
+
+uint8_t bootCmdTagWrite(firm_tag_t *p_tag)
+{
+  uint8_t ret = CMD_OK;
+  cmd_t *p_cmd = &cmd_boot;
+
+
+  cmdSendCmdRxResp(p_cmd, BOOT_CMD_TAG_WRITE, (uint8_t *)p_tag, sizeof(firm_tag_t), 500);
+  ret = p_cmd->error;
+
+  return ret; 
+}
+
+uint8_t bootCmdTagVerify(uint32_t timeout)
+{
+  uint8_t ret = CMD_OK;
+  cmd_t *p_cmd = &cmd_boot;
+
+
+  cmdSendCmdRxResp(p_cmd, BOOT_CMD_TAG_VERIFY, NULL, 0, timeout);
+  ret = p_cmd->error;
+
+  return ret;   
 }

@@ -67,7 +67,7 @@ target_link_options(${EXECUTABLE} PRIVATE
   -Wl,--gc-sections
   -Wl,--section-start=.text=0x4000
   -Wl,--section-start=.data=0x00804010
-  -Wl,--defsym=__TEXT_REGION_LENGTH__=112K
+  -Wl,--defsym=__TEXT_REGION_LENGTH__=111K
   -Xlinker -print-memory-usage -Xlinker
   )
 

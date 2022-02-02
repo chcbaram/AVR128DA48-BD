@@ -6,7 +6,7 @@
 #define FLASH_ADDR_OFFSET         0x4000
 #define FLASH_MAX_SIZE            (112L*1024L)
 #define FLASH_PAGE_SIZE           (512)
-#define FLASH_PAGE_COUNT          (FLASH_MAX_SIZE/FLASH_PAGE_SIZE)
+#define FLASH_PAGE_COUNT          (128L*1024L/FLASH_PAGE_SIZE)
 
 
 static bool is_log = false;

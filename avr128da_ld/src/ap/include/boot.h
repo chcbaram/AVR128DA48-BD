@@ -16,5 +16,8 @@ uint8_t bootCmdFlashErase(uint32_t addr, uint32_t length, uint32_t timeout);
 uint8_t bootCmdFlashWrite(uint32_t addr, uint8_t *p_data, uint32_t length, uint32_t timeout);
 uint8_t bootCmdFlashRead(uint32_t addr, uint8_t *p_data, uint32_t length, uint32_t timeout);
 uint8_t bootCmdJumpToFw(void);
+uint8_t bootCmdTagRead(firm_tag_t *p_tag);
+uint8_t bootCmdTagWrite(firm_tag_t *p_tag);
+uint8_t bootCmdTagVerify(uint32_t timeout);
 
 #endif

@@ -48,6 +48,7 @@
 
 
 #define VERSION_MAGIC_NUMBER      0x56455220    // "VER "
+#define TAG_MAGIC_NUMBER          0x54414720    // "TAG "
 
 
 typedef struct 
@@ -57,5 +58,12 @@ typedef struct
   char name_str[32];
 } firm_ver_t;
 
+typedef struct 
+{
+  uint32_t magic_number;
+  uint32_t fw_addr;
+  uint32_t fw_size;
+  uint32_t fw_crc;
+} firm_tag_t;
 
 #endif /* SRC_COMMON_DEF_H_ */

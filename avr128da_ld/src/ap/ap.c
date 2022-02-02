@@ -49,6 +49,7 @@ void apCliMode(void);
 void apDownMode(void);
 int32_t getFileSize(char *file_name);
 int32_t getFileVersion(char *file_name, firm_ver_t *p_ver);
+uint32_t getFileCrc(char *file_name);
 
 
 
@@ -211,6 +212,45 @@ int32_t getFileVersion(char *file_name, firm_ver_t *p_ver)
   return ret;
 }
 
+uint32_t getFileCrc(char *file_name)
+{
+  uint32_t ret = 0;
+  FILE *fp;
+
+  if ((fp = fopen( file_name, "rb")) == NULL)
+  {
+    fprintf( stderr, "Unable to open %s\n", file_name );
+    return -1;
+  }
+  else
+  {
+    uint8_t buffer[1024];
+    int len;
+    uint16_t calc_crc = 0;
+
+    while(1)
+    {
+      len = fread(buffer, 1, 1024, fp);
+      if (len > 0)
+      {
+        for (int i=0; i<len; i++)
+        {
+          utilUpdateCrc(&calc_crc, buffer[i]);
+        }
+      }
+      else
+      {
+        break;
+      }
+    }
+    ret = calc_crc;
+
+    fclose(fp);
+  }
+
+  return ret;
+}
+
 void apDownMode(void)
 {
   uint32_t arg_check = ARG_OPTION_PORT | ARG_OPTION_BAUD | ARG_OPTION_FILE;
@@ -248,6 +288,8 @@ void apDownMode(void)
   char firm_version[32];
   char firm_name[32];
   firm_ver_t firm_ver;
+  firm_tag_t firm_tag;
+  uint32_t pre_time;
 
   file_name = arg_option.file_str;
   addr = arg_option.addr_fw;
@@ -262,6 +304,19 @@ void apDownMode(void)
   logPrintf("file_addr : 0x%X \n", addr);
   logPrintf("file_len  : %d Bytes\n", file_len);
 
+  if (file_len <= 0)
+  {
+    logPrintf("File not available\n");
+    apExit();
+  }
+
+  firm_tag.magic_number = TAG_MAGIC_NUMBER;
+  firm_tag.fw_addr = arg_option.addr_fw;
+  firm_tag.fw_crc = 0;
+  firm_tag.fw_size = file_len;
+  firm_tag.fw_crc = getFileCrc(file_name);
+
+  logPrintf("file_crc  : 0x%04X\n", firm_tag.fw_crc);
 
   getFileVersion(file_name, &firm_ver);
   if (firm_ver.magic_number != VERSION_MAGIC_NUMBER)
@@ -322,13 +377,14 @@ void apDownMode(void)
 
     // 1. Flash Erase
     //
+    pre_time = millis();
     err_code = bootCmdFlashErase(addr, file_len, 5000);
     if (err_code != CMD_OK)
     {
       logPrintf("erase Fail : %d\n", err_code);      
       break;
     }
-    logPrintf("erase     : OK\n");    
+    logPrintf("erase     : OK, %dms\n", millis()-pre_time);    
 
 
     // 2. Flash Write
@@ -338,8 +394,9 @@ void apDownMode(void)
     uint32_t tx_len;
     int32_t  len_to_send;
     bool write_done = false;
-
-    tx_len = 0;
+    
+    tx_len = 0;    
+    pre_time = millis();
     while(tx_len < file_len)
     {
       len_to_send = fread(tx_buf, 1, tx_block_size, fp);
@@ -372,7 +429,37 @@ void apDownMode(void)
 
     if (write_done == true)
     {
-      logPrintf("write     : OK\n");      
+      logPrintf("write     : OK, %dms\n", millis()-pre_time);      
+
+      
+      err_code = bootCmdTagWrite(&firm_tag);
+      if (err_code != CMD_OK)
+      {
+        logPrintf("tag write : Fail, %d\n", err_code);
+        break;
+      }
+      else
+      {
+        logPrintf("tag write : OK\n");
+      }
+
+      pre_time = millis();
+      err_code = bootCmdTagVerify(1000);
+      if (err_code != CMD_OK)
+      {
+        logPrintf("tag verify: Fail, %d, %dms\n", err_code, millis()-pre_time);
+        break;
+      }
+      else
+      {
+        logPrintf("tag verify: OK, %dms\n", millis()-pre_time);
+      }
+
+      err_code = bootCmdTagWrite(&firm_tag);
+      if (err_code != CMD_OK)
+      {
+        break;
+      }
 
       if (arg_option.run_fw == true)
       {

@@ -6,7 +6,7 @@
 #define FLASH_ADDR_OFFSET         0x4000
 #define FLASH_MAX_SIZE            (112L*1024L)
 #define FLASH_PAGE_SIZE           (512)
-#define FLASH_PAGE_COUNT          (FLASH_MAX_SIZE/FLASH_PAGE_SIZE)
+#define FLASH_PAGE_COUNT          (128L*1024L/FLASH_PAGE_SIZE)
 
 
 static bool is_log = false;
@@ -96,7 +96,7 @@ bool flashErase(uint32_t addr, uint32_t length)
       pgm_word_write(flash_addr, 0x00);                         // Dummy write to start erase operation      
 
       if (is_log == true)
-        logPrintf_P(PSTR("Erased Addr 0x%X \n"), flash_addr); 
+        logPrintf_P(PSTR("Erased Addr 0x%lX \n"), flash_addr); 
     }
 
     if (NVMCTRL.STATUS & NVMCTRL_ERROR_gm)
