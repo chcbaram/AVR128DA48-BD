@@ -32,11 +32,26 @@
 #define      HW_BUTTON_MAX_CH       1
 #define      HW_BUTTON_OBJ_USE      1
 
+#define _USE_HW_GPIO
+#define      HW_GPIO_MAX_CH         2
+
+#define _USE_HW_SPI     
+#define      HW_SPI_MAX_CH          1
+
+#define _USE_HW_LCD
+#define      HW_LCD_WIDTH           128
+#define      HW_LCD_HEIGHT          64
+#define _USE_HW_SSD1306
+#define      HW_SSD1306_SPI   
+
 
 #define FLASH_ADDR_BOOT             0x0000
 #define FLASH_ADDR_BOOT_VER         0x00EC
 
 #define FLASH_ADDR_FW               0x4000
 #define FLASH_ADDR_FW_VER           0x40EC
+
+#define _PIN_GPIO_LCD_DC            0
+#define _PIN_GPIO_LCD_CS            1
 
 #endif

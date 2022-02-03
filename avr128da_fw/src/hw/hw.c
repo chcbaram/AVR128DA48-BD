@@ -19,13 +19,16 @@ bool hwInit(void)
   #ifdef _USE_HW_CLI
   cliInit();  
   #endif
+  gpioInit();
   ledInit();
   infoInit();
   uartInit();
+  spiInit();
   buttonInit();
   resetInit();
-  flashInit();
+  flashInit();  
   
+
   sei();
   return true;
 }
