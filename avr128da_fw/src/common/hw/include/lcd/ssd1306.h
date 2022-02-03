@@ -18,6 +18,7 @@
 
 bool ssd1306Init(void);
 bool ssd1306InitDriver(lcd_driver_t *p_driver);
+uint8_t *ssd1306GetBuffer(void);
 
 #endif
 

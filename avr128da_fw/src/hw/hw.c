@@ -10,7 +10,7 @@ volatile const firm_ver_t firm_ver __attribute__((section(".vectors"))) =
 };
 
 
-
+extern bool ssd1306Init(void);
 
 bool hwInit(void)
 {
@@ -27,9 +27,9 @@ bool hwInit(void)
   buttonInit();
   resetInit();
   flashInit();  
-  
+  lcdInit();  
 
-  sei();
+  sei();  
   return true;
 }
 

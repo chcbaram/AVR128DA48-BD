@@ -114,6 +114,7 @@ void lcdSendBuffer(uint8_t *p_data, uint32_t length, uint32_t timeout_ms);
 void lcdDisplayOff(void);
 void lcdDisplayOn(void);
 
+void     lcdSetFps(int32_t fps);
 uint32_t lcdGetFps(void);
 uint32_t lcdGetFpsTime(void);
 uint32_t lcdGetDrawTime(void);
@@ -140,10 +141,9 @@ void lcdDrawTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3,
 void lcdDrawFillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, uint32_t color);
 void lcdDrawString(int x, int y, uint16_t color, const char *str);
 void lcdPrintf(int x, int y, uint16_t color,  const char *fmt, ...);
+void lcdPrintf_P(int x, int y, uint16_t color,  const char *fmt, ...);
 void lcdSetFont(LcdFont font);
 LcdFont lcdGetFont(void);
-void lcdPrintfResize(int x, int y, uint16_t color,  float ratio_h, const char *fmt, ...);
-void lcdSetResizeMode(LcdResizeMode mode);
 
 #ifdef HW_LCD_LVGL
 void lcdDrawImage(int16_t x, int16_t y, lcd_img_t *p_img);

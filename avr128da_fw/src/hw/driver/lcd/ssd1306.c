@@ -8,6 +8,7 @@
 
 #include "lcd/ssd1306.h"
 #include "lcd/ssd1306_regs.h"
+#include "gpio.h"
 #ifdef HW_SSD1306_I2C
 #include "i2c.h"
 #else
@@ -25,6 +26,7 @@ static uint8_t i2c_ch  = _DEF_I2C1;
 static uint8_t i2c_dev = 0x78>>1; // 0x3C
 #else
 static uint8_t spi_ch  = _DEF_SPI1;
+static uint8_t gpio_dc = _PIN_GPIO_LCD_DC;
 #endif
 static void (*frameCallBack)(void) = NULL;
 
@@ -37,8 +39,9 @@ static bool ssd1306SendBuffer(uint8_t *p_data, uint32_t length, uint32_t timeout
 static bool ssd1306SetCallBack(void (*p_func)(void));
 static void ssd1306Fill(uint16_t color);
 static bool ssd1306UpdateDraw(void);
+#if 0
 static void ssd1306DrawPixel(uint8_t x, uint8_t y, uint16_t color);
-
+#endif
 
 static uint8_t ssd1306_buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 
@@ -65,13 +68,25 @@ bool ssd1306InitDriver(lcd_driver_t *p_driver)
   return true;
 }
 
+uint8_t *ssd1306GetBuffer(void)
+{
+  return ssd1306_buffer;
+}
+
 bool ssd1306WriteCmd(uint8_t cmd_data)
 {
+  bool ret;
+
   #ifdef HW_SSD1306_I2C
-  return i2cWriteByte(i2c_ch, i2c_dev, 0x00, cmd_data, 10);
+  ret = i2cWriteByte(i2c_ch, i2c_dev, 0x00, cmd_data, 10);
   #else
-  return true;
+  gpioPinWrite(gpio_dc, _DEF_LOW);
+  spiSetCS(spi_ch, _DEF_LOW);
+  ret = spiTransfer(spi_ch, &cmd_data, NULL, 1, 50);
+  spiSetCS(spi_ch, _DEF_HIGH);  
   #endif
+
+  return ret;
 }
 
 bool ssd1306Reset(void)
@@ -128,7 +143,7 @@ bool ssd1306Reset(void)
   ssd1306WriteCmd(0x14); //
   ssd1306WriteCmd(0xAF); //--turn on SSD1306 panel
 
-  ssd1306Fill(black);
+  ssd1306Fill(white);
   ssd1306UpdateDraw();
 
   return true;
@@ -150,8 +165,8 @@ uint16_t ssd1306GetHeight(void)
 
 bool ssd1306SendBuffer(uint8_t *p_data, uint32_t length, uint32_t timeout_ms)
 {
+#if 0
   uint16_t *p_buf = (uint16_t *)p_data;
-
 
   for (int y=0; y<SSD1306_HEIGHT; y++)
   {
@@ -160,6 +175,7 @@ bool ssd1306SendBuffer(uint8_t *p_data, uint32_t length, uint32_t timeout_ms)
       ssd1306DrawPixel(x, y, p_buf[y*LCD_WIDTH + x]);
     }
   }
+#endif
 
   ssd1306UpdateDraw();
 
@@ -190,6 +206,7 @@ void ssd1306Fill(uint16_t color)
 bool ssd1306UpdateDraw(void)
 {
   uint8_t i;
+  bool ret = true;
 
   for (i = 0; i < 8; i++)
   {
@@ -201,15 +218,24 @@ bool ssd1306UpdateDraw(void)
     #ifdef HW_SSD1306_I2C
     if (i2cWriteBytes(i2c_ch, i2c_dev, 0x40, &ssd1306_buffer[SSD1306_WIDTH * i], SSD1306_WIDTH, 100) == false)
     {
-      return false;
+      ret = false;
+      break;
     }
     #else
+    gpioPinWrite(gpio_dc, _DEF_HIGH);
+    spiSetCS(spi_ch, _DEF_LOW);
+    ret = spiTransfer(spi_ch, &ssd1306_buffer[SSD1306_WIDTH * i], NULL, SSD1306_WIDTH, 100);
+    spiSetCS(spi_ch, _DEF_HIGH);     
+    if (ret != true)
+    {
+      break;
+    }
     #endif
   }
 
-  return true;
+  return ret;
 }
-
+#if 0
 void ssd1306DrawPixel(uint8_t x, uint8_t y, uint16_t color)
 {
   if (x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT)
@@ -227,5 +253,5 @@ void ssd1306DrawPixel(uint8_t x, uint8_t y, uint16_t color)
     ssd1306_buffer[x + (y / 8) * SSD1306_WIDTH] &= ~(1 << (y % 8));
   }
 }
-
+#endif
 #endif

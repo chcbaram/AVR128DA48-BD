@@ -47,8 +47,8 @@ target_compile_options(${EXECUTABLE} PRIVATE
   -fdata-sections
   -ffunction-sections
   -MMD
-  -flto
-  -fno-fat-lto-objects
+  #-flto
+  #-fno-fat-lto-objects
 
   -Wall
   -Os
