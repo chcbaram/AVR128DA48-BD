@@ -20,7 +20,7 @@
 #define      HW_LED_MAX_CH          1
 
 #define _USE_HW_UART
-#define      HW_UART_MAX_CH         1
+#define      HW_UART_MAX_CH         2
 
 #define _USE_HW_CLI
 #define      HW_CLI_CMD_LIST_MAX    16
@@ -43,6 +43,10 @@
 #define      HW_LCD_HEIGHT          64
 #define _USE_HW_SSD1306
 #define      HW_SSD1306_SPI   
+
+#define _USE_HW_DXL
+#define      HW_DXL_PACKET_BUF_MAX  512
+#define      HW_DXL_DEVICE_CNT_MAX  16
 
 
 #define FLASH_ADDR_BOOT             0x0000

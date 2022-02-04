@@ -20,7 +20,7 @@ bool     uartOpen(uint8_t ch, uint32_t baud);
 bool     uartIsOpen(uint8_t ch);
 bool     uartClose(uint8_t ch);
 uint32_t uartAvailable(uint8_t ch);
-void     uartFlush(uint8_t ch);
+bool     uartFlush(uint8_t ch);
 void     uartPutch(uint8_t ch, uint8_t data);
 uint8_t  uartGetch(uint8_t ch);
 int32_t  uartWrite(uint8_t ch, uint8_t *p_data, uint32_t length);

@@ -28,7 +28,8 @@ bool hwInit(void)
   resetInit();
   flashInit();  
   lcdInit();  
-
+  dxlInit();
+  
   sei();  
   return true;
 }

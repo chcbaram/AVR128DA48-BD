@@ -40,6 +40,11 @@
 #define _DEF_OUTPUT_PULLUP    4
 #define _DEF_OUTPUT_PULLDOWN  5
 
+#define _DEF_DXL1             0
+#define _DEF_DXL2             1
+#define _DEF_DXL3             2
+#define _DEF_DXL4             3
+
 
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
