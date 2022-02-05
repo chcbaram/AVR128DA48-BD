@@ -3,11 +3,20 @@
 #include "gpio.h"
 
 
+typedef enum
+{
+  SPI_HW_SPI, 
+  SPI_HW_UART,
+} SpiType_t;
+
+
 typedef struct
 {
   bool is_open;
   bool is_tx_done;
   bool is_error;
+
+  SpiType_t spi_type;
   int8_t gpio_cs;
 
   void (*func_tx)(void);
@@ -17,7 +26,7 @@ typedef struct
 
 
 static spi_t spi_tbl[SPI_MAX_CH];
-
+static USART_t *h_uart = &USART3;
 
 
 
@@ -36,6 +45,7 @@ bool spiInit(void)
     spi_tbl[i].is_tx_done = true;
     spi_tbl[i].is_error = false;
     spi_tbl[i].func_tx = NULL;
+    spi_tbl[i].spi_type = SPI_HW_SPI;
   }
 
 #ifdef _USE_HW_CLI
@@ -49,12 +59,16 @@ bool spiBegin(uint8_t ch)
   bool ret = false;
   spi_t *p_spi = &spi_tbl[ch];
   SPI_t *h_spi;
+  uint32_t f_clk_per = F_CPU;
+  uint32_t sample_per_bit = 2;
+  uint16_t ubrr;
 
   switch(ch)
   {
     case _DEF_SPI1:
       h_spi = &SPI0;
       p_spi->h_spi = h_spi;
+      p_spi->spi_type = SPI_HW_SPI;
 
 
       PORTA.DIRSET = (1<<4); // PA4 MOSI Output
@@ -82,6 +96,33 @@ bool spiBegin(uint8_t ch)
 
       spiSetCS(p_spi->gpio_cs, _DEF_HIGH);
       break;
+
+    case _DEF_SPI2:          
+      p_spi->spi_type = SPI_HW_UART;  
+
+      ubrr = (f_clk_per/sample_per_bit) / 12000000;                 // 12Mbps
+      h_uart->BAUD = ubrr<<6;
+
+      h_uart->STATUS = h_uart->STATUS;
+      h_uart->CTRLC = (3 << USART_CMODE_gp)            // Host SPI
+                    | (0 << USART_UDORD_bp)            // MSb of the data word is transmitted first
+                    | (0 << USART_UCPHA_bp);           // Data are sampled on the leading (first) edge
+
+      PORTB.DIRSET = (1<<0); // PB0 TXD Output
+      PORTB.DIRCLR = (1<<1); // PB1 RXD Input
+      PORTB.DIRSET = (1<<2); // PB2 XCK Output
+
+      h_uart->CTRLB = (1 << USART_RXEN_bp)             // Receiver Enable
+                    | (1 << USART_TXEN_bp)             // Transmitter Enable
+                    | (0 << USART_RXMODE_gp);          // Receiver Mode = Normal Mode
+
+      h_uart->CTRLA = (0 << USART_RXCIE_bp);           // Receive Complete Interrupt Disable
+
+
+      p_spi->gpio_cs = 2;      
+      p_spi->is_open = true;
+      ret = true;
+      break;      
   }
 
   return ret;
@@ -96,11 +137,12 @@ void spiSetDataMode(uint8_t ch, uint8_t dataMode)
     return;
   }
 
-  h_spi = spi_tbl[ch].h_spi;
-
-  h_spi->CTRLB &= ~(0x3 << SPI_MODE0_bp);
-
-  h_spi->CTRLB |= (dataMode << SPI_MODE0_bp);
+  if (spi_tbl[ch].spi_type == SPI_HW_SPI)
+  {
+    h_spi = spi_tbl[ch].h_spi;
+    h_spi->CTRLB &= ~(0x3 << SPI_MODE0_bp);
+    h_spi->CTRLB |= (dataMode << SPI_MODE0_bp);
+  }
 }
 
 void spiSetBitWidth(uint8_t ch, uint8_t bit_width)
@@ -131,7 +173,7 @@ void spiSetCS(uint8_t ch, uint8_t value)
   gpioPinWrite(spi_tbl[ch].gpio_cs, value);
 }
 
-bool spiTransfer(uint8_t ch, uint8_t *tx_buf, uint8_t *rx_buf, uint32_t length, uint32_t timeout)
+bool spiTransfer_SPI(uint8_t ch, uint8_t *tx_buf, uint8_t *rx_buf, uint32_t length, uint32_t timeout)
 {
   bool ret = true;
   spi_t *p_spi = &spi_tbl[ch];
@@ -208,6 +250,96 @@ bool spiTransfer(uint8_t ch, uint8_t *tx_buf, uint8_t *rx_buf, uint32_t length, 
   }
 
   return ret;
+}
+
+bool spiTransfer_UART(uint8_t ch, uint8_t *tx_buf, uint8_t *rx_buf, uint32_t length, uint32_t timeout)
+{
+  bool ret = true;
+  spi_t *p_spi = &spi_tbl[ch];
+  uint32_t pre_time;
+  uint32_t tx_i = 0;
+  uint32_t rx_i = 0;
+  const size_t fifo_depth = 1;
+
+  if (p_spi->is_open == false) return false;
+
+  
+  uint16_t rx_remaining = length;
+  uint16_t tx_remaining = length;
+
+  h_uart->STATUS = h_uart->STATUS;
+      
+
+  pre_time = millis();
+  while (rx_remaining || tx_remaining) 
+  {
+    if (tx_remaining) 
+    {
+      if (h_uart->STATUS & (1<<USART_DREIF_bp) && rx_remaining < (tx_remaining + fifo_depth))
+      {
+        if (tx_buf == NULL)
+        {
+          h_uart->TXDATAL = 0xFF;        
+        }
+        else
+        {
+          h_uart->TXDATAL = tx_buf[tx_i];
+        }
+        tx_i++;
+        --tx_remaining;
+      }
+    }
+
+    if (rx_remaining) 
+    {
+      if (h_uart->STATUS & (1<<USART_RXCIF_bp))
+      {
+        if (rx_buf == NULL)
+        {
+          (void)h_uart->RXDATAL;
+        }
+        else
+        {
+          rx_buf[rx_i] = h_uart->RXDATAL;
+        }
+        --rx_remaining;
+        rx_i++;
+      }
+    }
+
+    if (millis()-pre_time >= timeout)
+    {
+      ret = false;
+      break;
+    }
+  }
+
+  while(1)
+  {
+    if (h_uart->STATUS & (1<<USART_TXCIF_bp))
+    {
+      break;
+    }
+    if (millis()-pre_time >= timeout)
+    {
+      ret = false;
+      break;
+    }
+  }
+
+  return ret;
+}
+
+bool spiTransfer(uint8_t ch, uint8_t *tx_buf, uint8_t *rx_buf, uint32_t length, uint32_t timeout)
+{
+  if (spi_tbl[ch].spi_type == SPI_HW_SPI)
+  {
+    return spiTransfer_SPI(ch, tx_buf, rx_buf, length, timeout);
+  }
+  else
+  {
+    return spiTransfer_UART(ch, tx_buf, rx_buf, length, timeout);
+  }
 }
 
 uint8_t spiTransfer8(uint8_t ch, uint8_t data)

@@ -33,10 +33,10 @@
 #define      HW_BUTTON_OBJ_USE      1
 
 #define _USE_HW_GPIO
-#define      HW_GPIO_MAX_CH         2
+#define      HW_GPIO_MAX_CH         3
 
 #define _USE_HW_SPI     
-#define      HW_SPI_MAX_CH          1
+#define      HW_SPI_MAX_CH          2
 
 #define _USE_HW_LCD
 #define      HW_LCD_WIDTH           128
