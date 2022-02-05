@@ -20,6 +20,7 @@ extern "C" {
 #include "lcd.h"
 #include "dxl.h"
 #include "sw_timer.h"
+#include "mcp2515.h"
 
 
 bool hwInit(void);

@@ -51,6 +51,9 @@
 #define _USE_HW_SW_TIMER
 #define      HW_SW_TIMER_MAX_CH     4
 
+#define _USE_HW_MCP2515
+#define      HW_MCP2515_MAX_CH      1
+
 
 #define FLASH_ADDR_BOOT             0x0000
 #define FLASH_ADDR_BOOT_VER         0x00EC

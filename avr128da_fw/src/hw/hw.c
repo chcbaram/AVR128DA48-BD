@@ -23,7 +23,7 @@ bool hwInit(void)
   gpioInit();
   ledInit();
   infoInit();
-  uartInit();
+  uartInit();  
   spiInit();
   buttonInit();
   resetInit();
@@ -31,8 +31,10 @@ bool hwInit(void)
   lcdInit();  
   dxlInit();
 
-  
   sei();  
+
+  mcp2515Init();
+  
   return true;
 }
 
