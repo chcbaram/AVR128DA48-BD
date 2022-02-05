@@ -1,6 +1,8 @@
 #include "ap.h"
 
 
+void ledISR(void *arg);
+
 
 
 
@@ -26,8 +28,18 @@ void apInit(void)
 
   lcdDrawRect(0, 0, LCD_WIDTH, LCD_HEIGHT, white);
   lcdUpdateDraw();  
+  delay(2000);
+
+  lcdClearBuffer(black);
+  lcdUpdateDraw();  
 
   lcdSetFont(LCD_FONT_HAN);
+
+  uint8_t led_ch;
+
+  led_ch = swtimerGetHandle();
+  swTimerSet(led_ch, 500, LOOP_TIME, ledISR, NULL);
+  swTimerStart(led_ch);
 }
 
 void apMain(void)
@@ -40,13 +52,16 @@ void apMain(void)
   {
     if (millis()-pre_time >= 500)
     {
-      pre_time = millis();
-
-      ledToggle(_DEF_LED1);      
+      pre_time = millis();      
     }
     
     #ifdef _USE_HW_CLI
     cliMain();
     #endif
   }
+}
+
+void ledISR(void *arg)
+{
+  ledToggle(_DEF_LED1);
 }

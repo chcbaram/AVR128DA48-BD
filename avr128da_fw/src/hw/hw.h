@@ -19,6 +19,7 @@ extern "C" {
 #include "spi.h"
 #include "lcd.h"
 #include "dxl.h"
+#include "sw_timer.h"
 
 
 bool hwInit(void);

@@ -1,12 +1,13 @@
 #include "bsp.h"
 
-
+extern void swTimerISR(void);
 static volatile uint32_t ms_cnt = 0;
 
 ISR(TCB0_INT_vect, ISR_NOBLOCK)
 {
   ms_cnt++;
   TCB0.INTFLAGS = (1<<TCB_CAPT_bp);
+  swTimerISR();
 }
 
 extern uint32_t __vector_default;

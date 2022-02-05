@@ -19,6 +19,7 @@ bool hwInit(void)
   #ifdef _USE_HW_CLI
   cliInit();  
   #endif
+  swTimerInit();
   gpioInit();
   ledInit();
   infoInit();
@@ -29,6 +30,7 @@ bool hwInit(void)
   flashInit();  
   lcdInit();  
   dxlInit();
+
   
   sei();  
   return true;
