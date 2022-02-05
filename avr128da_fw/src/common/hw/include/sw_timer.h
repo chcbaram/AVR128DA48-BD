@@ -31,7 +31,7 @@ void swTimerReset(uint8_t ch);
 void swTimerISR(void);
 
 
-uint8_t  swtimerGetHandle(void);
+uint8_t  swTimerGetHandle(void);
 uint32_t swTimerGetCounter(void);
 
 #endif

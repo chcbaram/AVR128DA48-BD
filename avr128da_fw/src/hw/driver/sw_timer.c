@@ -110,7 +110,7 @@ void swTimerReset(uint8_t ch)
   sw_timer_tbl[ch].timer_ctn  = sw_timer_tbl[ch].timer_init;
 }
 
-uint8_t swtimerGetHandle(void)
+uint8_t swTimerGetHandle(void)
 {
   uint8_t ret = sw_timer_handle_index;
 
@@ -122,7 +122,7 @@ uint8_t swtimerGetHandle(void)
   return ret;
 }
 
-uint32_t swtimerGetCounter(void)
+uint32_t swTimerGetCounter(void)
 {
   return sw_timer_counter;
 }

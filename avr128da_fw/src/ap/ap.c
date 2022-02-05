@@ -37,7 +37,7 @@ void apInit(void)
 
   uint8_t led_ch;
 
-  led_ch = swtimerGetHandle();
+  led_ch = swTimerGetHandle();
   swTimerSet(led_ch, 500, LOOP_TIME, ledISR, NULL);
   swTimerStart(led_ch);
 }
