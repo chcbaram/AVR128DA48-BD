@@ -577,14 +577,14 @@ void mcp2515Info(uint8_t ch)
   reg = mcp2515ReadReg(ch, 0x0E);
   reg_bits = (reg>>5) & 0x07;
 
-  cliPrintf("is_init[ch%d]\t: %d\n", ch, is_init[ch]);
-  cliPrintf("Operation Mode \t: ");
-  if (reg_bits == 0x00 ) cliPrintf("Nomal");
-  if (reg_bits == 0x01 ) cliPrintf("Sleep");
-  if (reg_bits == 0x02 ) cliPrintf("Loopback");
-  if (reg_bits == 0x03 ) cliPrintf("Listen-Only");
-  if (reg_bits == 0x04 ) cliPrintf("Configuration");
-  cliPrintf("\n");
+  cliPrintf_P(PSTR("is_init[ch%d]\t: %d\n"), ch, is_init[ch]);
+  cliPrintf_P(PSTR("Operation Mode \t: "));
+  if (reg_bits == 0x00 ) cliPrintf_P(PSTR("Nomal"));
+  if (reg_bits == 0x01 ) cliPrintf_P(PSTR("Sleep"));
+  if (reg_bits == 0x02 ) cliPrintf_P(PSTR("Loopback"));
+  if (reg_bits == 0x03 ) cliPrintf_P(PSTR("Listen-Only"));
+  if (reg_bits == 0x04 ) cliPrintf_P(PSTR("Configuration"));
+  cliPrintf_P(PSTR("\n"));
 
   uint32_t Fosc;
   uint32_t BRP;
@@ -602,10 +602,10 @@ void mcp2515Info(uint8_t ch)
   Tq  = 2*(BRP+1)*1000 / 8;
   SJW = ((mcp2515ReadReg(ch, 0x2A) >> 6) & 0x03);
 
-  cliPrintf("Fosc \t\t: %dMhz\n", Fosc);
-  cliPrintf("BRP  \t\t: %d\n", BRP);
-  cliPrintf("Tq   \t\t: %d ns, %d Mhz\n", Tq, 1000/Tq);
-  cliPrintf("SJW  \t\t: %d Tq\n", SJW);
+  cliPrintf_P(PSTR("Fosc \t\t: %dMhz\n"), Fosc);
+  cliPrintf_P(PSTR("BRP  \t\t: %d\n"), BRP);
+  cliPrintf_P(PSTR("Tq   \t\t: %d ns, %d Mhz\n"), Tq, 1000/Tq);
+  cliPrintf_P(PSTR("SJW  \t\t: %d Tq\n"), SJW);
 
   PropSeg   = ((mcp2515ReadReg(ch, 0x29) >> 0) & 0x07) + 1;
   PhaseSeg1 = ((mcp2515ReadReg(ch, 0x29) >> 3) & 0x07) + 1;
@@ -613,13 +613,13 @@ void mcp2515Info(uint8_t ch)
   Tbit      = SyncSeg + PropSeg + PhaseSeg1 + PhaseSeg2;
   NBR       = 1000000 / (Tbit*Tq);
 
-  cliPrintf("SyncSeg        \t: %d Tq\n", SyncSeg);
-  cliPrintf("PropSeg        \t: %d Tq\n", PropSeg);
-  cliPrintf("PhaseSeg1(PS1) \t: %d Tq\n", PhaseSeg1);
-  cliPrintf("PhaseSeg2(PS2) \t: %d Tq\n", PhaseSeg2);
-  cliPrintf("Tbit           \t: %d Tq, %d ns\n", Tbit, Tbit * Tq);
-  cliPrintf("Sample Point   \t: %d%% \n", (SyncSeg+PropSeg+PhaseSeg1) * 100 / Tbit);
-  cliPrintf("NBR            \t: %d Kbps\n", NBR);
+  cliPrintf_P(PSTR("SyncSeg        \t: %d Tq\n"), SyncSeg);
+  cliPrintf_P(PSTR("PropSeg        \t: %d Tq\n"), PropSeg);
+  cliPrintf_P(PSTR("PhaseSeg1(PS1) \t: %d Tq\n"), PhaseSeg1);
+  cliPrintf_P(PSTR("PhaseSeg2(PS2) \t: %d Tq\n"), PhaseSeg2);
+  cliPrintf_P(PSTR("Tbit           \t: %d Tq, %d ns\n"), Tbit, Tbit * Tq);
+  cliPrintf_P(PSTR("Sample Point   \t: %d%% \n"), (SyncSeg+PropSeg+PhaseSeg1) * 100 / Tbit);
+  cliPrintf_P(PSTR("NBR            \t: %d Kbps\n"), NBR);
 
 }
 
@@ -638,23 +638,23 @@ void cliMCP2515(cli_args_t *args)
   if (args->argc == 2 && args->isStr(1, "reg_info") == true)
   {
     ch = (uint8_t)args->getData(0);
-    cliPrintf("BFPCTRL    0x%02X : 0x%02X\n", 0x0C, mcp2515ReadReg(ch, 0x0C));
-    cliPrintf("TXRTSCTRL  0x%02X : 0x%02X\n", 0x0D, mcp2515ReadReg(ch, 0x0D));
-    cliPrintf("CANSTAT    0x%02X : 0x%02X\n", 0x0E, mcp2515ReadReg(ch, 0x0E));
-    cliPrintf("CANCTRL    0x%02X : 0x%02X\n", 0x0F, mcp2515ReadReg(ch, 0x0F));
-    cliPrintf("TEC        0x%02X : 0x%02X\n", 0x1C, mcp2515ReadReg(ch, 0x1C));
-    cliPrintf("REC        0x%02X : 0x%02X\n", 0x1D, mcp2515ReadReg(ch, 0x1D));
-    cliPrintf("CNF3       0x%02X : 0x%02X\n", 0x28, mcp2515ReadReg(ch, 0x28));
-    cliPrintf("CNF2       0x%02X : 0x%02X\n", 0x29, mcp2515ReadReg(ch, 0x29));
-    cliPrintf("CNF1       0x%02X : 0x%02X\n", 0x2A, mcp2515ReadReg(ch, 0x2A));
-    cliPrintf("CANINTE    0x%02X : 0x%02X\n", 0x2B, mcp2515ReadReg(ch, 0x2B));
-    cliPrintf("CANINTF    0x%02X : 0x%02X\n", 0x2C, mcp2515ReadReg(ch, 0x2C));
-    cliPrintf("EFLG       0x%02X : 0x%02X\n", 0x2D, mcp2515ReadReg(ch, 0x2D));
-    cliPrintf("TXB0CTRL   0x%02X : 0x%02X\n", 0x30, mcp2515ReadReg(ch, 0x30));
-    cliPrintf("TXB1CTRL   0x%02X : 0x%02X\n", 0x40, mcp2515ReadReg(ch, 0x40));
-    cliPrintf("TXB2CTRL   0x%02X : 0x%02X\n", 0x50, mcp2515ReadReg(ch, 0x50));
-    cliPrintf("RXB0CTRL   0x%02X : 0x%02X\n", 0x60, mcp2515ReadReg(ch, 0x60));
-    cliPrintf("RXB1CTRL   0x%02X : 0x%02X\n", 0x70, mcp2515ReadReg(ch, 0x70));
+    cliPrintf_P(PSTR("BFPCTRL    0x%02X : 0x%02X\n"), 0x0C, mcp2515ReadReg(ch, 0x0C));
+    cliPrintf_P(PSTR("TXRTSCTRL  0x%02X : 0x%02X\n"), 0x0D, mcp2515ReadReg(ch, 0x0D));
+    cliPrintf_P(PSTR("CANSTAT    0x%02X : 0x%02X\n"), 0x0E, mcp2515ReadReg(ch, 0x0E));
+    cliPrintf_P(PSTR("CANCTRL    0x%02X : 0x%02X\n"), 0x0F, mcp2515ReadReg(ch, 0x0F));
+    cliPrintf_P(PSTR("TEC        0x%02X : 0x%02X\n"), 0x1C, mcp2515ReadReg(ch, 0x1C));
+    cliPrintf_P(PSTR("REC        0x%02X : 0x%02X\n"), 0x1D, mcp2515ReadReg(ch, 0x1D));
+    cliPrintf_P(PSTR("CNF3       0x%02X : 0x%02X\n"), 0x28, mcp2515ReadReg(ch, 0x28));
+    cliPrintf_P(PSTR("CNF2       0x%02X : 0x%02X\n"), 0x29, mcp2515ReadReg(ch, 0x29));
+    cliPrintf_P(PSTR("CNF1       0x%02X : 0x%02X\n"), 0x2A, mcp2515ReadReg(ch, 0x2A));
+    cliPrintf_P(PSTR("CANINTE    0x%02X : 0x%02X\n"), 0x2B, mcp2515ReadReg(ch, 0x2B));
+    cliPrintf_P(PSTR("CANINTF    0x%02X : 0x%02X\n"), 0x2C, mcp2515ReadReg(ch, 0x2C));
+    cliPrintf_P(PSTR("EFLG       0x%02X : 0x%02X\n"), 0x2D, mcp2515ReadReg(ch, 0x2D));
+    cliPrintf_P(PSTR("TXB0CTRL   0x%02X : 0x%02X\n"), 0x30, mcp2515ReadReg(ch, 0x30));
+    cliPrintf_P(PSTR("TXB1CTRL   0x%02X : 0x%02X\n"), 0x40, mcp2515ReadReg(ch, 0x40));
+    cliPrintf_P(PSTR("TXB2CTRL   0x%02X : 0x%02X\n"), 0x50, mcp2515ReadReg(ch, 0x50));
+    cliPrintf_P(PSTR("RXB0CTRL   0x%02X : 0x%02X\n"), 0x60, mcp2515ReadReg(ch, 0x60));
+    cliPrintf_P(PSTR("RXB1CTRL   0x%02X : 0x%02X\n"), 0x70, mcp2515ReadReg(ch, 0x70));
 
     uint32_t pre_time;
 
@@ -663,7 +663,7 @@ void cliMCP2515(cli_args_t *args)
     {
       mcp2515ReadReg(ch, 0x2A);
     }
-    cliPrintf("%d ms\n", millis()-pre_time);
+    cliPrintf_P(PSTR("%d ms\n"), millis()-pre_time);
 
     ret = true;
   }
@@ -678,16 +678,16 @@ void cliMCP2515(cli_args_t *args)
     addr   = (uint8_t)args->getData(2);
     length = (uint16_t)args->getData(3);
 
-    cliPrintf("<mcp2515 ch%d read register>\n", ch);
+    cliPrintf_P(PSTR("<mcp2515 ch%d read register>\n"), ch);
     for (int i=0; i<length; i++)
     {
       if (mcp2515ReadRegs(ch, addr+i, buf, 1) == true)
       {
-        cliPrintf("0x%02X : 0x%02X\n", addr+i, buf[0]);
+        cliPrintf_P(PSTR("0x%02X : 0x%02X\n"), addr+i, buf[0]);
       }
       else
       {
-        cliPrintf("spi fail\n");
+        cliPrintf_P(PSTR("spi fail\n"));
         break;
       }
 
@@ -728,11 +728,11 @@ void cliMCP2515(cli_args_t *args)
 
     if (update == true)
     {
-      cliPrintf("ch%d Baud %s OK\n", ch, args->getStr(2));
+      cliPrintf_P(PSTR("ch%d Baud %s OK\n"), ch, args->getStr(2));
     }
     else
     {
-      cliPrintf("ch%d Wrong Baud\n", ch);
+      cliPrintf_P(PSTR("ch%d Wrong Baud\n"), ch);
     }
 
     ret = true;
@@ -762,11 +762,11 @@ void cliMCP2515(cli_args_t *args)
 
     if (update == true)
     {
-      cliPrintf("ch%d Mode %s OK\n", ch, args->getStr(2));
+      cliPrintf_P(PSTR("ch%d Mode %s OK\n"), ch, args->getStr(2));
     }
     else
     {
-      cliPrintf("ch%d Wrong Mode\n", ch);
+      cliPrintf_P(PSTR("ch%d Wrong Mode\n"), ch);
     }
 
     ret = true;
@@ -786,7 +786,7 @@ void cliMCP2515(cli_args_t *args)
     {
       if (mcp2515ReadMsg(ch, &rx_msg) == true)
       {
-        cliPrintf("ch: %d, id: %03X, dlc: %d, ext: %d, ",
+        cliPrintf_P(PSTR("ch: %d, id: %03X, dlc: %d, ext: %d, "),
                   ch,
                   rx_msg.id,
                   rx_msg.dlc,
@@ -794,9 +794,9 @@ void cliMCP2515(cli_args_t *args)
 
         for (int i=0; i<rx_msg.dlc; i++)
         {
-          cliPrintf("%02X ", rx_msg.data[i]);
+          cliPrintf_P(PSTR("%02X "), rx_msg.data[i]);
         }
-        cliPrintf("\n");
+        cliPrintf_P(PSTR("\n"));
       }
 
       if (cliAvailable() > 0)
@@ -824,36 +824,36 @@ void cliMCP2515(cli_args_t *args)
         msg.data[6] = (cnt<<6)+(cnt&0x0F<<2);
         msg.data[7] = (cnt<<7)+(cnt&0x0F<<3);
 
-        cliPrintf("\n");
+        cliPrintf_P(PSTR("\n"));
         if (mcp2515SendMsg(rx_ch, &msg) == true)
         {
-          cliPrintf("ch%d SendMsg: OK\n", rx_ch);
+          cliPrintf_P(PSTR("ch%d SendMsg: OK\n"), rx_ch);
         }
         else
         {
-          cliPrintf("ch%d SendMsg: Fail\n", rx_ch);
+          cliPrintf_P(PSTR("ch%d SendMsg: Fail\n"), rx_ch);
         }
 
         uint8_t status;
 
-        cliPrintf("ch%d Status : 0b", rx_ch);
+        cliPrintf_P(PSTR("ch%d Status : 0b"), rx_ch);
 
         status = mcp2515ReadStatus(rx_ch);
         for (int i=0; i<8; i++)
         {
           if (status & 0x80)
           {
-            cliPrintf("1");
+            cliPrintf_P(PSTR("1"));
           }
           else
           {
-            cliPrintf("0");
+            cliPrintf_P(PSTR("0"));
           }
           status <<= 1;
         }
-        cliPrintf("\n");
-        cliPrintf("ch%d ErrFlag: 0x%02X", rx_ch, mcp2515ReadErrorFlags(rx_ch));
-        cliPrintf("\n");
+        cliPrintf_P(PSTR("\n"));
+        cliPrintf_P(PSTR("ch%d ErrFlag: 0x%02X"), rx_ch, mcp2515ReadErrorFlags(rx_ch));
+        cliPrintf_P(PSTR("\n"));
       }
     }
 
@@ -868,11 +868,11 @@ void cliMCP2515(cli_args_t *args)
     {
       if (is_init[ch] == true)
       {
-        cliPrintf("ch%d reset OK\n", ch);
+        cliPrintf_P(PSTR("ch%d reset OK\n"), ch);
       }
       else
       {
-        cliPrintf("ch%d reset Fail\n", ch);
+        cliPrintf_P(PSTR("ch%d reset Fail\n"), ch);
       }
     }
 
@@ -882,13 +882,13 @@ void cliMCP2515(cli_args_t *args)
 
   if (ret != true)
   {
-    cliPrintf("mcp2515 ch[0~%d] info\n", MCP2515_MAX_CH-1);
-    cliPrintf("mcp2515 ch[0~%d] reg_info\n", MCP2515_MAX_CH-1);
-    cliPrintf("mcp2515 ch[0~%d] read_reg addr length\n", MCP2515_MAX_CH-1);
-    cliPrintf("mcp2515 ch[0~%d] set_baud 100k:125k:250k:500k:1000k\n", MCP2515_MAX_CH-1);
-    cliPrintf("mcp2515 ch[0~%d] set_mode normal:loopback:listen:config\n", MCP2515_MAX_CH-1);
-    cliPrintf("mcp2515 ch[0~%d] test\n", MCP2515_MAX_CH-1);
-    cliPrintf("mcp2515 reset\n");
+    cliPrintf_P(PSTR("mcp2515 ch[0~%d] info\n"), MCP2515_MAX_CH-1);
+    cliPrintf_P(PSTR("mcp2515 ch[0~%d] reg_info\n"), MCP2515_MAX_CH-1);
+    cliPrintf_P(PSTR("mcp2515 ch[0~%d] read_reg addr length\n"), MCP2515_MAX_CH-1);
+    cliPrintf_P(PSTR("mcp2515 ch[0~%d] set_baud 100k:125k:250k:500k:1000k\n"), MCP2515_MAX_CH-1);
+    cliPrintf_P(PSTR("mcp2515 ch[0~%d] set_mode normal:loopback:listen:config\n"), MCP2515_MAX_CH-1);
+    cliPrintf_P(PSTR("mcp2515 ch[0~%d] test\n"), MCP2515_MAX_CH-1);
+    cliPrintf_P(PSTR("mcp2515 reset\n"));
   }
 }
 #endif
