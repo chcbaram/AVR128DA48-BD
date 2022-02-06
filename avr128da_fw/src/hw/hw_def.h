@@ -6,7 +6,7 @@
 #include "bsp.h"
 
 
-#define _DEF_FIRMWATRE_VERSION    "V220201R1"
+#define _DEF_FIRMWATRE_VERSION    "V220206R1"
 #define _DEF_BOARD_NAME           "AVR128DA48"
 
 
@@ -53,6 +53,10 @@
 
 #define _USE_HW_MCP2515
 #define      HW_MCP2515_MAX_CH      1
+
+#define _USE_HW_CAN
+#define      HW_CAN_MAX_CH          1
+#define      HW_CAN_MSG_RX_BUF_MAX  8
 
 
 #define FLASH_ADDR_BOOT             0x0000

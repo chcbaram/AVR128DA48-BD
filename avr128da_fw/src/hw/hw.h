@@ -21,6 +21,7 @@ extern "C" {
 #include "dxl.h"
 #include "sw_timer.h"
 #include "mcp2515.h"
+#include "can.h"
 
 
 bool hwInit(void);

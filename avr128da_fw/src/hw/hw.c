@@ -33,7 +33,7 @@ bool hwInit(void)
 
   sei();  
 
-  mcp2515Init();
+  canInit();
   
   return true;
 }
