@@ -434,12 +434,12 @@ void cliCan(cli_args_t *args)
   {
     for (int i=0; i<CAN_MAX_CH; i++)
     {
-      cliPrintf("is_open       : %d\n", can_tbl[i].is_open);
+      cliPrintf_P(PSTR("is_open       : %d\n"), can_tbl[i].is_open);
 
-      cliPrintf("q_rx_full_cnt : %d\n", can_tbl[i].q_rx_full_cnt);
-      cliPrintf("q_tx_full_cnt : %d\n", can_tbl[i].q_tx_full_cnt);
-      cliPrintf("fifo_full_cnt : %d\n", can_tbl[i].fifo_full_cnt);
-      cliPrintf("fifo_lost_cnt : %d\n", can_tbl[i].fifo_lost_cnt);
+      cliPrintf_P(PSTR("q_rx_full_cnt : %d\n"), can_tbl[i].q_rx_full_cnt);
+      cliPrintf_P(PSTR("q_tx_full_cnt : %d\n"), can_tbl[i].q_tx_full_cnt);
+      cliPrintf_P(PSTR("fifo_full_cnt : %d\n"), can_tbl[i].fifo_full_cnt);
+      cliPrintf_P(PSTR("fifo_lost_cnt : %d\n"), can_tbl[i].fifo_lost_cnt);
       canErrPrint(i);
     }
     ret = true;
@@ -460,21 +460,21 @@ void cliCan(cli_args_t *args)
         canMsgRead(_DEF_CAN1, &msg);
 
         index %= 1000;
-        cliPrintf("%03d(R) <- id ", index++);
+        cliPrintf_P(PSTR("%03d(R) <- id "), index++);
         if (msg.id_type == CAN_STD)
         {
-          cliPrintf("std ");
+          cliPrintf_P(PSTR("std "));
         }
         else
         {
-          cliPrintf("ext ");
+          cliPrintf_P(PSTR("ext "));
         }
-        cliPrintf(": 0x%08X, L:%02d, ", msg.id, msg.length);
+        cliPrintf_P(PSTR(": 0x%08X, L:%02d, "), msg.id, msg.length);
         for (int i=0; i<msg.length; i++)
         {
-          cliPrintf("0x%02X ", msg.data[i]);
+          cliPrintf_P(PSTR("0x%02X "), msg.data[i]);
         }
-        cliPrintf("\n");
+        cliPrintf_P(PSTR("\n"));
       }
     }
     ret = true;
@@ -507,50 +507,50 @@ void cliCan(cli_args_t *args)
         if (canMsgWrite(_DEF_CAN1, &msg, 10) > 0)
         {
           index %= 1000;
-          cliPrintf("%03d(T) -> id ", index++);
+          cliPrintf_P(PSTR("%03d(T) -> id "), index++);
           if (msg.id_type == CAN_STD)
           {
-            cliPrintf("std ");
+            cliPrintf_P(PSTR("std "));
           }
           else
           {
-            cliPrintf("ext ");
+            cliPrintf_P(PSTR("ext "));
           }
-          cliPrintf(": 0x%08X, L:%02d, ", msg.id, msg.length);
+          cliPrintf_P(PSTR(": 0x%08X, L:%02d, "), msg.id, msg.length);
           for (int i=0; i<msg.length; i++)
           {
-            cliPrintf("0x%02X ", msg.data[i]);
+            cliPrintf_P(PSTR("0x%02X "), msg.data[i]);
           }
-          cliPrintf("\n");
+          cliPrintf_P(PSTR("\n"));
         }
         else
         {
-          cliPrintf("err %d \n", mcp2515ReadErrorFlags(can_tbl[_DEF_CAN1].hfdcan));
+          cliPrintf_P(PSTR("err %d \n"), mcp2515ReadErrorFlags(can_tbl[_DEF_CAN1].hfdcan));
         }
 
 
         if (canGetRxErrCount(_DEF_CAN1) > 0 || canGetTxErrCount(_DEF_CAN1) > 0)
         {
-          cliPrintf("ErrCnt : %d, %d\n", canGetRxErrCount(_DEF_CAN1), canGetTxErrCount(_DEF_CAN1));
+          cliPrintf_P(PSTR("ErrCnt : %d, %d\n"), canGetRxErrCount(_DEF_CAN1), canGetTxErrCount(_DEF_CAN1));
         }
 
         if (err_int_cnt > 0)
         {
-          cliPrintf("Cnt : %d\n",err_int_cnt);
+          cliPrintf_P(PSTR("Cnt : %d\n"),err_int_cnt);
           err_int_cnt = 0;
         }
       }
 
       if (can_tbl[_DEF_CAN1].err_code != err_code)
       {
-        cliPrintf("ErrCode : 0x%X\n", can_tbl[_DEF_CAN1].err_code);
+        cliPrintf_P(PSTR("ErrCode : 0x%X\n"), can_tbl[_DEF_CAN1].err_code);
         canErrPrint(_DEF_CAN1);
         err_code = can_tbl[_DEF_CAN1].err_code;
       }
 
       if (canUpdate())
       {
-        cliPrintf("BusOff Recovery\n");
+        cliPrintf_P(PSTR("BusOff Recovery\n"));
       }
 
 
@@ -559,21 +559,21 @@ void cliCan(cli_args_t *args)
         canMsgRead(_DEF_CAN1, &msg);
 
         index %= 1000;
-        cliPrintf("%03d(R) <- id ", index++);
+        cliPrintf_P(PSTR("%03d(R) <- id "), index++);
         if (msg.id_type == CAN_STD)
         {
-          cliPrintf("std ");
+          cliPrintf_P(PSTR("std "));
         }
         else
         {
-          cliPrintf("ext ");
+          cliPrintf_P(PSTR("ext "));
         }
-        cliPrintf(": 0x%08X, L:%02d, ", msg.id, msg.length);
+        cliPrintf_P(PSTR(": 0x%08X, L:%02d, "), msg.id, msg.length);
         for (int i=0; i<msg.length; i++)
         {
-          cliPrintf("0x%02X ", msg.data[i]);
+          cliPrintf_P(PSTR("0x%02X "), msg.data[i]);
         }
-        cliPrintf("\n");
+        cliPrintf_P(PSTR("\n"));
       }
     }
     ret = true;
@@ -581,9 +581,9 @@ void cliCan(cli_args_t *args)
 
   if (ret == false)
   {
-    cliPrintf("can info\n");
-    cliPrintf("can read\n");
-    cliPrintf("can send\n");
+    cliPrintf_P(PSTR("can info\n"));
+    cliPrintf_P(PSTR("can read\n"));
+    cliPrintf_P(PSTR("can send\n"));
   }
 }
 #endif
