@@ -60,6 +60,11 @@ void apMain(void)
     #ifdef _USE_HW_CLI
     cliMain();
     #endif
+
+    if (uartAvailable(_DEF_UART3))
+    {
+      uartPrintf(_DEF_UART3, "rx : 0x%X\n", uartRead(_DEF_UART3));
+    }
   }
 }
 

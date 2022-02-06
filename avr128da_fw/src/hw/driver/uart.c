@@ -131,6 +131,40 @@ bool uartOpen(uint8_t ch, uint32_t baud)
       p_uart->is_open  = true;
       ret = true;
       break;
+
+    case _DEF_UART3:
+      p_uart = &uart_tbl[ch];
+      p_uart->rx_mode  = UART_MODE_INTERRUPT;
+      p_uart->baud     = baud;
+      p_uart->p_handle = &USART2;
+
+      qbufferCreate(&p_uart->qbuffer_rx, p_uart->rx_buf, UART_RX_BUF_LENGTH);
+      
+
+      ubrr = (f_clk_per * (64/sample_per_bit)) / baud;
+      p_uart->p_handle->BAUD = ubrr;
+
+      p_uart->p_handle->STATUS = p_uart->p_handle->STATUS;
+      p_uart->p_handle->CTRLC = (0x00 << USART_CMODE_gp)            // Asynchronous USART
+                              | (0x00 << USART_PMODE_gp)            // Parity Mode = Disabled
+                              | (0x01 << USART_SBMODE_bp)           // Stop Bit Mode = 1 Stop bit
+                              | (0x03 << USART_CHSIZE_gp);          // Character Size = 8 bit
+
+      PORTF.DIRSET = (1<<4); // PF4 TXD Output
+      PORTF.DIRCLR = (1<<5); // PF5 RXD Input
+
+      PORTMUX.USARTROUTEA &= ~(3<<PORTMUX_USART20_bp);
+      PORTMUX.USARTROUTEA |=  (1<<PORTMUX_USART20_bp);              // PF4(TXD), PF5(RXD)
+
+      p_uart->p_handle->CTRLB = (0x01 << USART_RXEN_bp)             // Receiver Enable
+                              | (0x01 << USART_TXEN_bp)             // Transmitter Enable
+                              | (0x00 << USART_RXMODE_gp);          // Receiver Mode = Normal Mode
+
+      p_uart->p_handle->CTRLA = (0x01 << USART_RXCIE_bp);           // Receive Complete Interrupt Enable
+
+      p_uart->is_open  = true;
+      ret = true;
+      break;      
   }
 
   return ret;
@@ -317,4 +351,9 @@ ISR(USART0_TXC_vect, ISR_BLOCK)
 {
   USART0.CTRLB |= (0x01 << USART_RXEN_bp); // Receiver Enable  
   USART0.STATUS = (1 << USART_TXCIF_bp);   // Clear TXCIF
+}
+
+ISR(USART2_RXC_vect, ISR_NOBLOCK)
+{
+  uartRxHandler(_DEF_UART3, USART2.RXDATAL);
 }
