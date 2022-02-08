@@ -34,6 +34,7 @@ bool hwInit(void)
   flashInit();  
   lcdInit();  
   dxlInit();
+  buzzerInit();
 
   sei();  
 

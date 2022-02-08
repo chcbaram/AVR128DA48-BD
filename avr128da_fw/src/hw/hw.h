@@ -22,6 +22,7 @@ extern "C" {
 #include "sw_timer.h"
 #include "mcp2515.h"
 #include "can.h"
+#include "buzzer.h"
 
 
 bool hwInit(void);
