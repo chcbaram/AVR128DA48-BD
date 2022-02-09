@@ -102,10 +102,33 @@ void cliBuzzer(cli_args_t *args)
     ret = true;
   }
 
+  if (args->argc == 1 && args->isStr(0, "test"))
+  {
+    uint16_t freq_tbl[8] = {261, 293, 329, 349, 391, 440, 493, 523};
+    uint8_t freq_i;
+
+    for (int i=0; i<16; i++)
+    {
+      if (i/8 == 0)
+      {
+        freq_i = i%8;
+      }
+      else
+      {
+        freq_i = 7 - (i%8);
+      }
+      buzzerOn(freq_tbl[freq_i], 150);
+      cliPrintf_P(PSTR("%dHz, %dms\n"), freq_tbl[freq_i], 100);
+      delay(300);
+    }
+    ret = true;
+  }
+
   if (ret != true)
   {
     cliPrintf_P(PSTR("buzzer on freq(32~500000) time_ms\n"));
     cliPrintf_P(PSTR("buzzer off\n"));
+    cliPrintf_P(PSTR("buzzer test\n"));
   }
 }
 #endif
