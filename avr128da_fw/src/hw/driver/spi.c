@@ -81,7 +81,7 @@ bool spiBegin(uint8_t ch)
       h_spi->CTRLA = (1 << SPI_MASTER_bp)     // SPI Host mode
                    | (0 << SPI_DORD_bp)       // MSB
                    | (1 << SPI_CLK2X_bp)      // 24Mhz x 2 = 48Mhz
-                   | (0 << SPI_PRESC0_bp);    // DIV4, 48Mhz/4 = 12Mhz
+                   | (1 << SPI_PRESC0_bp);    // DIV4, 48Mhz/8 = 6Mhz
 
       h_spi->CTRLB = (1 << SPI_BUFEN_bp)       // Buffer Mode Enable
                    | (1 << SPI_SSD_bp)         // Disable the Client Select line when operating as SPI host 

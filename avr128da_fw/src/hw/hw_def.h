@@ -35,16 +35,17 @@
 #define      HW_BUTTON_OBJ_USE      1
 
 #define _USE_HW_GPIO
-#define      HW_GPIO_MAX_CH         3
+#define      HW_GPIO_MAX_CH         4
 
 #define _USE_HW_SPI     
 #define      HW_SPI_MAX_CH          2
 
 #define _USE_HW_LCD
 #define      HW_LCD_WIDTH           128
-#define      HW_LCD_HEIGHT          64
+#define      HW_LCD_HEIGHT          128
 #define _USE_HW_SSD1306
 #define      HW_SSD1306_SPI   
+#define      HW_SSD1306_MAX_CH      2
 
 #define _USE_HW_DXL
 #define      HW_DXL_PACKET_BUF_MAX  512

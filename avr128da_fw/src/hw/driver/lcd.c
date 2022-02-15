@@ -988,6 +988,9 @@ void cliLcd(cli_args_t *args)
 
   if (args->argc == 1 && args->isStr(0, "test") == true)
   {
+    uint8_t o_y = 0;
+    uint8_t o_x = 0;
+
     lcdSetFont(LCD_FONT_HAN);
 
     while(cliKeepLoop())
@@ -1002,10 +1005,19 @@ void cliLcd(cli_args_t *args)
         lcdPrintf_P(0,16*2, white, PSTR("%d ms") , lcdGetFpsTime());
         lcdPrintf_P(0,16*3, white, PSTR("%d ms") , millis());
 
-        lcdDrawFillRect( 0, 70, 10, 10, red);
-        lcdDrawFillRect(10, 70, 10, 10, green);
-        lcdDrawFillRect(20, 70, 10, 10, blue);
+        lcdDrawFillRect(o_x +  0, 70, 10, 10, red);
+        lcdDrawFillRect(o_x + 10, 70, 10, 10, green);
+        lcdDrawFillRect(o_x + 20, 70, 10, 10, blue);
+        o_x += 2;
+        o_x %= LCD_WIDTH;
 
+        lcdSetFont(LCD_FONT_16x26);
+        lcdDrawFillRect(30, o_y, 16*4, 26, white);
+        lcdPrintf_P(30, o_y, black, PSTR("Test"));
+        o_y += 2;
+        o_y %= LCD_HEIGHT;
+        
+        lcdSetFont(LCD_FONT_HAN);
         lcdRequestDraw();
       }
     }

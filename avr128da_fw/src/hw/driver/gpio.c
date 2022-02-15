@@ -18,6 +18,7 @@ const gpio_tbl_t gpio_tbl[GPIO_MAX_CH] =
         {&PORTF, 2,  _DEF_OUTPUT, _DEF_HIGH },      // 0. LCD DC
         {&PORTA, 7,  _DEF_OUTPUT, _DEF_HIGH },      // 1. LCD CS
         {&PORTB, 3,  _DEF_OUTPUT, _DEF_HIGH },      // 2. MCP2515 CS
+        {&PORTA, 3,  _DEF_OUTPUT, _DEF_HIGH },      // 3. LCD2 CS
     };
 
 

@@ -18,7 +18,7 @@
 #ifdef _USE_HW_SSD1306
 
 #define SSD1306_WIDTH       HW_LCD_WIDTH
-#define SSD1306_HEIGHT      HW_LCD_HEIGHT
+#define SSD1306_HEIGHT      (HW_LCD_HEIGHT/HW_SSD1306_MAX_CH)
 
 
 #ifdef HW_SSD1306_I2C
@@ -27,6 +27,8 @@ static uint8_t i2c_dev = 0x78>>1; // 0x3C
 #else
 static uint8_t spi_ch  = _DEF_SPI1;
 static uint8_t gpio_dc = _PIN_GPIO_LCD_DC;
+static uint8_t lcd_cs  = 0;
+static uint8_t gpio_cs[HW_SSD1306_MAX_CH] = {1, 3};
 #endif
 static void (*frameCallBack)(void) = NULL;
 
@@ -43,15 +45,20 @@ static bool ssd1306UpdateDraw(void);
 static void ssd1306DrawPixel(uint8_t x, uint8_t y, uint16_t color);
 #endif
 
-static uint8_t ssd1306_buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
+static uint8_t ssd1306_buffer[HW_LCD_WIDTH * HW_LCD_HEIGHT / 8];
 
 
 
 bool ssd1306Init(void)
 {
-  bool ret;
+  bool ret = true;
 
-  ret = ssd1306Reset();
+  for (int8_t i=0; i<HW_SSD1306_MAX_CH; i++)
+  {
+    lcd_cs = i;
+    ret &= ssd1306Reset();
+  }
+  lcd_cs = 0;
 
   return ret;
 }
@@ -81,9 +88,9 @@ bool ssd1306WriteCmd(uint8_t cmd_data)
   ret = i2cWriteByte(i2c_ch, i2c_dev, 0x00, cmd_data, 10);
   #else
   gpioPinWrite(gpio_dc, _DEF_LOW);
-  spiSetCS(spi_ch, _DEF_LOW);
+  gpioPinWrite(gpio_cs[lcd_cs], _DEF_LOW);
   ret = spiTransfer(spi_ch, &cmd_data, NULL, 1, 50);
-  spiSetCS(spi_ch, _DEF_HIGH);  
+  gpioPinWrite(gpio_cs[lcd_cs], _DEF_HIGH);  
   #endif
 
   return ret;
@@ -177,7 +184,12 @@ bool ssd1306SendBuffer(uint8_t *p_data, uint32_t length, uint32_t timeout_ms)
   }
 #endif
 
-  ssd1306UpdateDraw();
+  for (int8_t i=0; i<HW_SSD1306_MAX_CH; i++)
+  {
+    lcd_cs = i;
+    ssd1306UpdateDraw();
+  }
+  lcd_cs = 0;
 
   if (frameCallBack != NULL)
   {
@@ -206,7 +218,11 @@ void ssd1306Fill(uint16_t color)
 bool ssd1306UpdateDraw(void)
 {
   uint8_t i;
+  uint16_t buf_offset;
   bool ret = true;
+  
+
+  buf_offset =  lcd_cs * SSD1306_WIDTH * SSD1306_HEIGHT / 8;
 
   for (i = 0; i < 8; i++)
   {
@@ -221,11 +237,11 @@ bool ssd1306UpdateDraw(void)
       ret = false;
       break;
     }
-    #else
+    #else    
     gpioPinWrite(gpio_dc, _DEF_HIGH);
-    spiSetCS(spi_ch, _DEF_LOW);
-    ret = spiTransfer(spi_ch, &ssd1306_buffer[SSD1306_WIDTH * i], NULL, SSD1306_WIDTH, 100);
-    spiSetCS(spi_ch, _DEF_HIGH);     
+    gpioPinWrite(gpio_cs[lcd_cs], _DEF_LOW);
+    ret = spiTransfer(spi_ch, &ssd1306_buffer[buf_offset + SSD1306_WIDTH * i], NULL, SSD1306_WIDTH, 100);
+    gpioPinWrite(gpio_cs[lcd_cs], _DEF_HIGH);   
     if (ret != true)
     {
       break;
