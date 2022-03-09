@@ -23,6 +23,7 @@ extern "C" {
 #include "mcp2515.h"
 #include "can.h"
 #include "buzzer.h"
+#include "ir_remote.h"
 
 
 bool hwInit(void);

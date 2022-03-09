@@ -15,7 +15,7 @@
 #define _USE_HW_RESET
 #define _USE_HW_FLASH
 #define _USE_HW_BUZZER
-
+#define _USE_HW_IR_REMOTE
 
 
 #define _USE_HW_LED
