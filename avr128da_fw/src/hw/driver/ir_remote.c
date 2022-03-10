@@ -35,9 +35,6 @@ typedef struct
 } ir_remote_bit_ref_t;
 
 
-static bool is_ovf = false;
-
-
 static ir_remote_bit_t bit_buf[IR_REMOTE_BIT_BUF_MAX];
 static qblock_t rx_bit_q;
 
@@ -73,7 +70,7 @@ bool irRemoteInit(void)
   
   // TCB1 
   TCB1.CTRLA = (2 << TCB_CLKSEL0_bp);  // TCA0, 1.5Mhz
-  TCB1.CTRLB = (5 << TCB_CNTMODE0_bp); // Input Capture Frequency and Pulse-Width Measurement mode
+  TCB1.CTRLB = (3 << TCB_CNTMODE0_bp); // Input Capture Frequency Measurement mode
   
   TCB1.EVCTRL = (1 << TCB_FILTER_bp)  // enables the Input Capture Noise Cancellation unit.
               | (0 << TCB_EDGE_bp)
@@ -104,8 +101,8 @@ IrRemoteBitValue_t irRemoteGetBit(ir_remote_bit_ref_t *p_ref, ir_remote_bit_t *p
   {
     bool in_range = true;
 
-    if (p_bit->on_time <= (p_ref[i].on_time - p_ref[i].on_error)) in_range = false;
-    if (p_bit->on_time >= (p_ref[i].on_time + p_ref[i].on_error)) in_range = false;
+    //if (p_bit->on_time <= (p_ref[i].on_time - p_ref[i].on_error)) in_range = false;
+    //if (p_bit->on_time >= (p_ref[i].on_time + p_ref[i].on_error)) in_range = false;
 
     if (p_bit->total_time <= (p_ref[i].total_time - p_ref[i].total_error)) in_range = false;
     if (p_bit->total_time >= (p_ref[i].total_time + p_ref[i].total_error)) in_range = false;
@@ -127,26 +124,16 @@ ISR(TCB1_INT_vect, ISR_BLOCK)
 
   if (TCB1.INTFLAGS & (1<<TCB_OVF_bp))
   {
-    is_ovf = true;
-    bit_time.on_time = TCB1.CCMP;
-    TCB1.INTCTRL &= ~(1 << TCB_OVF_bp);
+    TCB1.INTCTRL &= ~(1 << TCB_OVF_bp);        
   }
 
   if (TCB1.INTFLAGS & (1<<TCB_CAPT_bp))
   {
+    TCB1.INTCTRL |= (1 << TCB_OVF_bp);
+
     bit_time.on_time = TCB1.CCMP;
-    if (is_ovf == true)
-    {
-      is_ovf = false;
-      TCB1.INTCTRL |= (1 << TCB_OVF_bp);
-    }
-    else
-    {
-      //logPrintf("capt %d, %d\n", TCB1.CCMP, TCB1.CNT);      
-      bit_time.on_time = TCB1.CCMP;
-      bit_time.total_time = TCB1.CNT;
-      qblockWrite(&rx_bit_q, (uint8_t *)&bit_time, 1);
-    }    
+    bit_time.total_time = TCB1.CCMP;
+    qblockWrite(&rx_bit_q, (uint8_t *)&bit_time, 1);      
   }
 
   TCB1.INTFLAGS = TCB1.INTFLAGS;
@@ -169,16 +156,24 @@ void cliIrRemote(cli_args_t *args)
       if (qblockAvailable(&rx_bit_q) > 0)
       {
         qblockRead(&rx_bit_q, (uint8_t *)&data, 1);
-        cliPrintf_P(PSTR("%4X : on %5d, t %5d, bit : "), index++, data.on_time, data.total_time);
 
         IrRemoteBitValue_t bit_value;
         bit_value = irRemoteGetBit(bit_ref, &data);
-        if (bit_value == IR_REMOTE_BIT_NORMAL) cliPrintf_P(PSTR("Normal"));
-        if (bit_value == IR_REMOTE_BIT_REPEAT) cliPrintf_P(PSTR("Repeat"));
-        if (bit_value == IR_REMOTE_BIT_HIGH)   cliPrintf_P(PSTR("1"));
-        if (bit_value == IR_REMOTE_BIT_LOW)    cliPrintf_P(PSTR("0"));
+        if (bit_value != IR_REMOTE_BIT_LAST)
+        {
+          if (bit_value == IR_REMOTE_BIT_NORMAL || bit_value == IR_REMOTE_BIT_REPEAT)
+          {
+            index = 0;
+          }
 
-        cliPrintf_P(PSTR("\n"));
+          cliPrintf_P(PSTR("%4d : on %5d, t %5d, bit : "), index, data.on_time, data.total_time);
+
+          if (bit_value == IR_REMOTE_BIT_NORMAL) cliPrintf_P(PSTR("Normal"));
+          if (bit_value == IR_REMOTE_BIT_REPEAT) cliPrintf_P(PSTR("Repeat"));
+          if (bit_value == IR_REMOTE_BIT_HIGH)   cliPrintf_P(PSTR("1"));
+          if (bit_value == IR_REMOTE_BIT_LOW)    cliPrintf_P(PSTR("0"));
+          cliPrintf_P(PSTR("\n"));          
+        }
       }
     }
     ret = true;
