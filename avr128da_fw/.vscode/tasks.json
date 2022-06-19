@@ -6,10 +6,14 @@
     {
       "label": "avrdude fw",
       "type": "shell",
+      "command": "avrdude",
+      "windows": {
+        "command": "tools/avrdude/avrdude"
+      },      
       "command": "avrdude -C${workspaceFolder}/tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -D -U flash:w:${workspaceFolder}/build/avr128da_fw.hex:i",
-      "options": {
-        "cwd": "${workspaceFolder}/tools/avrdude"
-      }         
+      "args": [
+        "-C./tools/avrdude/avrdude.conf", "-v", "-pavr128da48", "-cpkobn_updi", "-D", "-U", "flash:w:build/avr128da_fw.hex:i",          
+      ]        
     },
     {
       "label": "build fw",
