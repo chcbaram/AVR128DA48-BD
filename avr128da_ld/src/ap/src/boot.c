@@ -42,12 +42,15 @@ bool bootInit(uint8_t ch, char *port_name, uint32_t baud)
     uartClose(ch);  
   }
 
-  uartOpen(ch, baud);
+  if (uartOpen(ch, baud) != true)
+  {
+    printf("uartOpen() Fail\n");
+    return false;
+  }
   uartPrintf(ch, "\r\nreset boot 0x01\r\n");  
   delay(10);
   uartClose(ch);
   delay(100);  
-
   ret = cmdOpen(&cmd_boot, ch, baud);
 
   return ret;

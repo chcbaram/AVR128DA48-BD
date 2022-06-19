@@ -768,7 +768,7 @@ void cliMemoryDump(cli_args_t *args)
   {
     if((idx%4) == 0)
     {
-      cliPrintf(" 0x%08X: ", (unsigned int)addr);
+      cliPrintf(" 0x%08X: ", (long)addr);
     }
     cliPrintf(" 0x%08X", *(addr));
 

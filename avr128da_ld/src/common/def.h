@@ -15,11 +15,11 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
-#include <conio.h>
 #include <signal.h>
 #include <unistd.h>
 
 #if defined (__WIN32__) || (__WIN64__)
+#include <conio.h>
 #include <Windows.h>
 #endif
 

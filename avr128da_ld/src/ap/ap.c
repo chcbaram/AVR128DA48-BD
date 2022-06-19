@@ -290,13 +290,18 @@ void apDownMode(void)
   firm_ver_t firm_ver;
   firm_tag_t firm_tag;
   uint32_t pre_time;
+  bool ret;
 
   file_name = arg_option.file_str;
   addr = arg_option.addr_fw;
   baud = arg_option.port_baud;
 
-  bootInit(_USE_UART_CMD, arg_option.port_str, baud);
-
+  ret = bootInit(_USE_UART_CMD, arg_option.port_str, baud);
+  if (ret != true)
+  {
+    logPrintf("bootInit() Fail\n");
+    apExit();
+  }
 
   file_len = getFileSize(file_name);
 
@@ -342,7 +347,7 @@ void apDownMode(void)
 
 
     logPrintf("\n");
-
+    
     // Read Boot Version
     //
     err_code = bootCmdReadBootVersion(boot_version);
@@ -350,11 +355,21 @@ void apDownMode(void)
     {
       logPrintf("boot ver  : %s\n", boot_version);    
     }
+    else
+    {
+      logPrintf("boot ver  : fail %d\n", err_code);   
+      break; 
+    }
 
     err_code = bootCmdReadBootName(boot_name);
     if (err_code == CMD_OK)
     {
       logPrintf("boot name : %s\n", boot_name);    
+    }
+    else
+    {
+      logPrintf("boot name : fail %d\n", err_code);   
+      break; 
     }
 
     logPrintf("\n");

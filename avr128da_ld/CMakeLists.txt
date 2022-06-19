@@ -45,7 +45,6 @@ target_compile_options(${EXECUTABLE} PRIVATE
   
   -fdata-sections
   -ffunction-sections
-  -MMD
 
   -Wall
   -Os
@@ -56,6 +55,4 @@ target_compile_options(${EXECUTABLE} PRIVATE
 target_link_options(${EXECUTABLE} PRIVATE
   
   -lm
-  -Wl,--gc-sections
-  -Xlinker -print-memory-usage -Xlinker
   )

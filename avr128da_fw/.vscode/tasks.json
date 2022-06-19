@@ -9,7 +9,7 @@
       "command": "avrdude",
       "windows": {
         "command": "tools/avrdude/avrdude"
-      },      
+      },  
       "args": [
         "-C./tools/avrdude/avrdude.conf", "-v", "-pavr128da48", "-cpkobn_updi", "-D", "-U", "flash:w:build/avr128da_fw.hex:i",          
       ]        
@@ -22,7 +22,11 @@
     {
       "label": "down fw",
       "type": "shell",
-      "command": "./tools/avr128da_ld.exe -p com46 -b 115200 -f ./build/avr128da_fw.bin -r"
+      "command": "./tools/mac/avr128da_ld -p /dev/cu.usbmodem124102 -b 115200 -f ./build/avr128da_fw.bin -r",
+      "windows": {
+        "command": "./tools/avr128da_ld.exe -p com46 -b 115200 -f ./build/avr128da_fw.bin -r"
+      },  
+
     }    
   ]
 }
