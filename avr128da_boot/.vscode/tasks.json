@@ -6,17 +6,26 @@
     {
       "label": "avrdude boot",
       "type": "shell",
-      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -e -U flash:w:build/avr128da_boot.hex:i"
+      "command": "avrdude -C${workspaceFolder}/tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -e -U flash:w:${workspaceFolder}/build/avr128da_boot.hex:i",
+      "options": {
+        "cwd": "${workspaceFolder}/tools/avrdude"
+      }      
     },
     {
       "label": "avrdude BOOTSIZE 0",
       "type": "shell",
-      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:0:m"
+      "command": "avrdude -C${workspaceFolder}/tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:0:m",
+      "options": {
+        "cwd": "${workspaceFolder}/tools/avrdude"
+      }      
     },
     {
       "label": "avrdude BOOTSIZE 16KB",
       "type": "shell",
-      "command": "tools/avrdude/avrdude -C./tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:32:m"
+      "command": "avrdude -C${workspaceFolder}/tools/avrdude/avrdude.conf -v -pavr128da48 -cpkobn_updi -U fuse8:w:32:m",
+      "options": {
+        "cwd": "${workspaceFolder}/tools/avrdude"
+      }      
     },
     {
       "label": "build boot",

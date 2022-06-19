@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.13.0)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tools")
+include(avr-gcc)
 
 project(avr128da_boot
   LANGUAGES ASM C CXX
